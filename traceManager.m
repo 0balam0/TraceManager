@@ -199,11 +199,11 @@ try
       set(handles.et_vertOffset, 'string', []);
       set(handles.et_timeOffset, 'string', []);
       set(handles.et_vertGain, 'string', []);
-      set(handles.et_LPF, 'string', []);
+%       set(handles.et_LPF, 'string', []);
       
       % Teoresi 
-      set(handles.teo_der, 'value', 0);
-      set(handles.teo_int, 'value', 0);
+%       set(handles.teo_der, 'value', 0);
+%       set(handles.teo_int, 'value', 0);
 
       % controllo che sia un segnale amplificato per aggiornare il campo et_gain
       if contains(sQuant, 'Gain') || contains(sQuant, 'LPF')
@@ -225,11 +225,11 @@ try
             for cc = 1:idx
                 refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant{1})
             end
-           popup_menu = get(handles.popupmenu_operazioni, 'value');
+%            popup_menu = get(handles.popupmenu_operazioni, 'value');
       
-          if popup_menu > 1
-              popupmenu_operazioni_Callback(handles.popupmenu_operazioni, eventdata, handles)
-          else
+%           if popup_menu > 1
+%               popupmenu_operazioni_Callback(handles.popupmenu_operazioni, eventdata, handles)
+%           else
               set(handles.edit_new_channel,'string','');
           end
       end
@@ -237,9 +237,9 @@ try
        dispError(Me)
       uiwait(msgbox('Could not perform required operation.','','warn','modal'))
    end
-catch Me
-    dispError(Me)
-end
+% catch Me
+%     dispError(Me)
+% end
 
 return
 
@@ -657,9 +657,9 @@ try
         stringa = get(handles.lb_exp, 'string');
         
         %Teoresi
-        check_der=get(handles.teo_der, 'value');
-        check_int=get(handles.teo_int, 'value');
-        popup_sel_index = get(handles.popupmenu_operazioni, 'Value');
+%         check_der=get(handles.teo_der, 'value');
+%         check_int=get(handles.teo_int, 'value');
+%         popup_sel_index = get(handles.popupmenu_operazioni, 'Value');
         
         if ischar(stringa)
             sQuant = stringa;
@@ -705,37 +705,37 @@ try
         end
         %
         % Teoresi
-        if popup_sel_index > 1 || check_der==1 || check_int==1
-            if ischar(stringa)
-                stringa={stringa};
-            end
-            A=stringa{val}; %name_channel %sQuant
-            B=[A '_' num2str(nMan)];
-            A = cellstr(A);
-            B = cellstr(B);
-            
-            string_listbox=get(handles.listbox_operations,'string');
-            % value_listbox=get(handles.listbox_operations,'value');
-            empty_string=' ';
-            if ischar (string_listbox)
-                string_listbox={string_listbox};
-            end
-            if isequal(string_listbox{1},empty_string)
-                set(handles.listbox_operations,'string',B);
-            else
-                %     B=union(string_listbox,B);
-                L = length(string_listbox);
-                string_listbox{L+1} = B{1};
-                set(handles.listbox_operations,'string', string_listbox);
-                set(handles.listbox_operations,'value',length(string_listbox));
-            end
-            if check_der~=1 && check_int~=1
-                return
-            end
-        end
+%         if popup_sel_index > 1 || check_der==1 || check_int==1
+%             if ischar(stringa)
+%                 stringa={stringa};
+%             end
+%             A=stringa{val}; %name_channel %sQuant
+%             B=[A '_' num2str(nMan)];
+%             A = cellstr(A);
+%             B = cellstr(B);
+%             
+%             string_listbox=get(handles.listbox_operations,'string');
+%             % value_listbox=get(handles.listbox_operations,'value');
+%             empty_string=' ';
+%             if ischar (string_listbox)
+%                 string_listbox={string_listbox};
+%             end
+%             if isequal(string_listbox{1},empty_string)
+%                 set(handles.listbox_operations,'string',B);
+%             else
+%                 %     B=union(string_listbox,B);
+%                 L = length(string_listbox);
+%                 string_listbox{L+1} = B{1};
+%                 set(handles.listbox_operations,'string', string_listbox);
+%                 set(handles.listbox_operations,'value',length(string_listbox));
+%             end
+%             if check_der~=1 && check_int~=1
+%                 return
+%             end
+%         end
         
         edit_gain=get(handles.et_vertGain, 'string');
-        edit_lpf=get(handles.et_LPF, 'string');
+%         edit_lpf=get(handles.et_LPF, 'string');
         
         if isfield(UD.tTH.(sF), sQuant)
             %||~isempty(strfind(sQuant,'derivate'))
@@ -780,7 +780,7 @@ try
             UD.tTH.(sF).(sQuant).v0 = str2num(get(handles.et_vertOffset, 'string'));
             UD.tTH.(sF).(sQuant).t0 = str2num(get(handles.et_timeOffset, 'string'));
             UD.tTH.(sF).(sQuant).g0 = str2num(edit_gain);
-            UD.tTH.(sF).(sQuant).lpf0 = str2num(edit_lpf);
+%             UD.tTH.(sF).(sQuant).lpf0 = str2num(edit_lpf);
             %
             % perform unit conversion
             v0 = get(handles.pm_convUM, 'value');
@@ -812,14 +812,14 @@ try
         
         % Teoresi
         if ~contains(sQuant, 'Gain') && ~contains(sQuant, 'LPF') % Per generare nuovo canale in lb_avail
-            if ~isempty(edit_gain) || ~isempty(edit_lpf)
+            if ~isempty(edit_gain)
                 if check_der==1 || check_int==1 || popup_sel_index > 1
                     if not(isempty(edit_gain)) && not(isempty(edit_lpf))
                         sQuant1 = ['Gain_' 'LPF_' sQuant '_' edit_gain '_' edit_lpf];
                     elseif not(isempty(edit_gain))
                         sQuant1 = ['Gain_' sQuant '_' edit_gain];
                     else
-                        sQuant1 = ['LPF_' sQuant '_' edit_lpf];
+                        sQuant1 = ['LPF_' sQuant '_'];
                     end
                 else
                     sQuant1 = new_channel;
@@ -859,45 +859,45 @@ try
         end
 
         % Teoresi (utilizzo dell'editor per cambiare nome di derivate e integrali)
-        if check_der==1 || check_int==1
-            if not(isfield(handles, 'edit_name'))
-                handles.edit_name = {};
-            end
-            if isempty(handles.edit_name)
-                a = get(handles.listbox_operations, 'String'); % NB: sicuramente è una cella con almeno un elemento
-                b = length(a);
-                if b>1
-                    v = (1:1:b-1);
-                    set(handles.listbox_operations, 'Value', v);
-                    a = a(1:end-1);
-                    set(handles.listbox_operations, 'String', a);
-                    uiwait(msgbox('Delete the selected channels from the Operation List','','warn','modal'))
-                    return
-                end
-            end
-            l = length(handles.edit_name);
-            name = get(handles.edit_new_channel, 'String'); %new_channel
-            handles.edit_name{l+1}= name{1};
-            guidata(hObject,handles);
-        end
+%         if check_der==1 || check_int==1
+%             if not(isfield(handles, 'edit_name'))
+%                 handles.edit_name = {};
+%             end
+%             if isempty(handles.edit_name)
+%                 a = get(handles.listbox_operations, 'String'); % NB: sicuramente è una cella con almeno un elemento
+%                 b = length(a);
+%                 if b>1
+%                     v = (1:1:b-1);
+%                     set(handles.listbox_operations, 'Value', v);
+%                     a = a(1:end-1);
+%                     set(handles.listbox_operations, 'String', a);
+%                     uiwait(msgbox('Delete the selected channels from the Operation List','','warn','modal'))
+%                     return
+%                 end
+%             end
+%             l = length(handles.edit_name);
+%             name = get(handles.edit_new_channel, 'String'); %new_channel
+%             handles.edit_name{l+1}= name{1};
+%             guidata(hObject,handles);
+%         end
 
         % Teoresi (utilizzo dell'editor per cambiare nome del vettore risultante da un'operazione tra canali)
-        if popup_sel_index > 1
-            if isfield(handles, 'edit_name')
-                if not(isempty(handles.edit_name))
-                    l = length(handles.edit_name);
-                    v = 1:1:l;
-                    set(handles.listbox_operations, 'Value', v);
-                    a = get(handles.listbox_operations, 'String'); % NB: sicuramente è una cella con più di un elemento
-                    a = a(1:end-1);
-                    set(handles.listbox_operations, 'String', a);
-                    uiwait(msgbox('Delete the selected channels from the Operation List','','warn','modal'))
-                    return
-                end
-            end
-            handles.edit_name1 = new_channel;
-            guidata(hObject,handles);
-        end
+%         if popup_sel_index > 1
+%             if isfield(handles, 'edit_name')
+%                 if not(isempty(handles.edit_name))
+%                     l = length(handles.edit_name);
+%                     v = 1:1:l;
+%                     set(handles.listbox_operations, 'Value', v);
+%                     a = get(handles.listbox_operations, 'String'); % NB: sicuramente è una cella con più di un elemento
+%                     a = a(1:end-1);
+%                     set(handles.listbox_operations, 'String', a);
+%                     uiwait(msgbox('Delete the selected channels from the Operation List','','warn','modal'))
+%                     return
+%                 end
+%             end
+%             handles.edit_name1 = new_channel;
+%             guidata(hObject,handles);
+%         end
 
         % Fix cambiocolore
         NuovoNome = get(handles.edit_new_channel, 'String');
@@ -982,10 +982,10 @@ try
       set(handles.et_timeManOffset, 'string', tTHk.time.v0);
       set(handles.et_vertOffset, 'string', tTHk.(sQuant).v0);
       set(handles.et_timeOffset, 'string', tTHk.(sQuant).t0);
-      set(handles.et_LPF, 'string', tTHk.(sQuant).lpf0);
+%       set(handles.et_LPF, 'string', tTHk.(sQuant).lpf0);
       set(handles.et_vertGain, 'string', tTHk.(sQuant).g0);
-      set(handles.teo_der,'value',0);
-      set(handles.teo_int,'value',0);
+%       set(handles.teo_der,'value',0);
+%       set(handles.teo_int,'value',0);
       sCurrUnit = tTHk.(sQuant).u;
       
       % Refresh linestyle e linewidth interfaccia
