@@ -1725,10 +1725,24 @@ for k = 1:length(cF)
          if isfield(tTH_k,(sField))
              for cc=1:length(src)
                  if isfield(tTH_k.(sField), src{cc})
-                     tAx(k).assi(i).signals(j).(src{cc}) = tTH_k.(sField).(src{cc});
+                     tAx(k).assi(i).signals(j).Lstyle = tTH_k.(sField).(src{cc});
                  else
                      tAx(k).assi(i).signals(j).(src{cc}) = dft{cc};
                  end
+             end
+         end
+
+          if isfield(tTH_k,(sField))
+             if isfield(tTH_k.(sField),'Lstyle')
+                 tAx(k).assi(i).signals(j).Lstyle = tTH_k.(sField).Lstyle;
+             else
+                 tAx(k).assi(i).signals(j).Lstyle = 'Solid';
+             end
+             
+             if isfield(tTH_k.(sField),'Width')
+                 tAx(k).assi(i).signals(j).Width = tTH_k.(sField).Width;
+             else
+                 tAx(k).assi(i).signals(j).Width = '1.5';
              end
          end
       end

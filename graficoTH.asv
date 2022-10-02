@@ -428,9 +428,9 @@ function handles = creaOggetti(handles, bForceZero)
             end
             
             vStyle = char(tAx(k).assi(i).signals(j).Lstyle);
-            vWidth = char(tAx(k).assi(i).signals(j).Width);            
-            Mstyle = char(tAx(k).assi(i).signals(j).Mstyle);
-            Msize  = str2double(char(tAx(k).assi(i).signals(j).Msize));
+            vWidth = char(tAx(k).assi(i).signals(j).Width);
+            M = char(tAx(k).assi(i).signals(j).Width);
+            vWidth = char(tAx(k).assi(i).signals(j).Width);
             switch vStyle
                 case 'Solid'
                     vStyle = '-';
@@ -444,9 +444,8 @@ function handles = creaOggetti(handles, bForceZero)
             
             vWidth = str2num(vWidth);
 
-            set(hL, 'Color', vColore, 'LineWidth',vWidth, 'LineStyle',vStyle,...
-                    'MarkerEdgeColor', vColore, 'MarkerFaceColor', vColore, 'MarkerSize', Msize, 'Marker', Mstyle,...
-                    'ButtonDownFcn','', 'Parent',hA, 'Tag',['line_',num2str(i),'_',num2str(j),''], 'UserData', tAx(k).assi(i).signals(j).name);
+            set(hL, 'Color',vColore, 'LineWidth',vWidth, 'LineStyle',vStyle, 'MarkerEdgeColor',vColore, 'MarkerFaceColor',vColore, 'MarkerSize',4,...
+               'ButtonDownFcn','', 'Parent',hA, 'Tag',['line_',num2str(i),'_',num2str(j),''], 'UserData', tAx(k).assi(i).signals(j).name);
             
             % legenda
             hLine(length(hLine)+1) = hL;
