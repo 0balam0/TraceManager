@@ -221,8 +221,10 @@ try
       % Aggiornamento interfaccia proprietà Linee
       % STILE
        % se sono presenti segnali nella lista
-            
-           refreshLinestyle(handles, UserData.tTH.(cF{idx}), sQuant{1})
+
+            for cc = 1:idx
+                refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant{1})
+            end
            popup_menu = get(handles.popupmenu_operazioni, 'value');
       
           if popup_menu > 1
@@ -1054,6 +1056,7 @@ for i = 1:length(idx)
 end
 
 cC = listaColori;
+
 for i = 1:length(idx)
    set(handles.(cTag{idx(i)}), 'visible','on', 'ForegroundColor',max((cC{i}-[0.1 0.1 0.1]),0)) % scurisco i colori
 end
