@@ -3,14 +3,11 @@ disattivata funzione function disattivaEditSelez(handles), Non funzionava
 
 add:
     in function lb_exp_Callback
-      if ~(handles.lb_exp.String{1} == ' ') per evitare errori di aggiornamento finestre etc
+      if EnbDisSelez(handles) per evitare errori di aggiornamento finestre etc
 
-    in: function lb_Ax_Callback(hObject, eventdata, handles)  
-            attivaEditSelez(handles)
-            disattivaEditSelez(handles)
-    in
+    replaced disattivaEditSelez(handles) con EnbDisSelez(handles)
         
 
 
 create: 
-    function attivaEditSelez(handles) %riattiva le finestre delle operazioni se disattivate
+    function EnbDisSelez(handles) %controlla se nell'asse selezionato ci sono segnali e abilita o disabilita alcuni obj

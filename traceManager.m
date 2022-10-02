@@ -23,7 +23,7 @@ function varargout = traceManager(varargin)
 
 % Edit the above text to modify the response to help traceManager
 
-% Last Modified by GUIDE v2.5 02-Oct-2022 12:19:39
+% Last Modified by GUIDE v2.5 02-Oct-2022 13:18:08
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -132,7 +132,7 @@ hlu=get(hObject,'value');
    
    try
        % disable panel of line data settings
-      setPanelEnable(handles.pan_color, 'off');
+      % setPanelEnable(handles.pan_color, 'off');
             
       % visualizzo nell'et_descr la descrizione della grandezza
       cCont = get(hObject, 'string');
@@ -174,9 +174,8 @@ try
    UserData = get(gcbf,'UserData');
 
    try
-       % disable panel of line data settings
-       setPanelEnable(handles.pan_color, 'on'); % Teoresi off-->on
-       
+       if EnbDisSelez(handles) % solo se sono presenti dei segnali all'interno della lista
+           
        cCont = get(hObject, 'string');            
        sQuant = cCont(get(hObject, 'value'));
 
@@ -221,9 +220,7 @@ try
 
       % Aggiornamento interfaccia proprietà Linee
       % STILE
-      fprintf('stringa:_%s_', handles.lb_exp.String{1})
-      if ~(handles.lb_exp.String{1} == ' ') % se sono presenti segnali nella lista
-          disp('sono entrato')
+       % se sono presenti segnali nella lista
           if isfield(UserData.tTH.(cF{idx(1)}).(char(sQuant)),'Lstyle')
               et_Style = char(UserData.tTH.(cF{idx(1)}).(char(sQuant)).Lstyle);
               switch et_Style
@@ -301,7 +298,7 @@ try
    set(handles.lb_exp, 'value',length(cQuantExp))
    %
    % attivo la modifica delle grandezze selezionate
-%    attivaEditSelez(handles);
+   EnbDisSelez(handles);
 
 catch Me
     dispError(Me)
@@ -314,8 +311,8 @@ try
    [bEmpty] = remOneLB(handles.lb_exp);
    if bEmpty
       % disattivo edit delle grandezze selezionate
-      EnbDisSelez(handles)
-      disattivaEditSelez(handles)
+      EnbDisSelez(handles);
+%       disattivaEditSelez(handles)
    end
 catch Me
     dispError(Me)
@@ -329,7 +326,8 @@ try
    set(handles.lb_exp, 'value', 1)
    set(handles.lb_exp, 'string', {' '})
    % disattivo edit delle grandezze selezionate
-   disattivaEditSelez(handles)
+   EnbDisSelez(handles);
+%    disattivaEditSelez(handles)
 catch Me
     dispError(Me)
 end
@@ -947,7 +945,7 @@ try
         set(gcbf, 'UserData', UD);
         
         % disable panel of line data settings
-        setPanelEnable(handles.pan_color, 'off');
+        % setPanelEnable(handles.pan_color, 'off');
     catch Me
         dispError(Me)
         uiwait(msgbox('Could not perform required operation','','warn','modal'))
@@ -1070,7 +1068,7 @@ try
       scriviColoreLinea(handles, color)      
      
       % enable panel of settings
-      setPanelEnable(handles.pan_color, 'on');
+      % setPanelEnable(handles.pan_color, 'on');
    catch Me
        dispError(Me)
       uiwait(msgbox('Could not perform required operation','','warn','modal'))
@@ -1396,12 +1394,9 @@ return
 %%%%%%%%% pannello di selezione assi %%%%%%%%%%
 
 function lb_Ax_Callback(hObject, eventdata, handles)
-%
+
 % salvo il contenuto dell'asse da cui mi sono appena spostato
-
-% recupero le infos dalla di Dati dalla figura
-
-    
+% recupero le infos dalla di Dati dalla figura 
 UserData = get(gcbf,'UserData');
 
 vOld = get(handles.lb_Ax, 'UserData'); % valore precedente della lista
@@ -1416,17 +1411,20 @@ visualizzaAsse(handles, vNew);
 %
 try
     % disable panel of line data settings
-    setPanelEnable(handles.pan_color, 'off');
+    % setPanelEnable(handles.pan_color, 'off');
     % UserData.tAx potrebbe ancora non esistere (ex: non acnora fatto un
     % plot)
     % UserData.tAx.assi(1).Ylimit = [0 25 400]; % [yMin Step yMax]
-    visualizzaLimitiAsse(handles, UserData.tAx(1), vNew);
-    visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
-    visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
+    if isfield(UserData, 'tAx') % disable panel of line data settings
+        visualizzaLimitiAsse(handles, UserData.tAx(1), vNew);
+        visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
+        visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
+    end
+    EnbDisSelez(handles);
 catch Me
   dispError(Me)
 end
-    EnbDisSelez(handles) % abilita/ disabilita obj operazioni se ci sono/non ci sono segnali nell'Asse selezionato MDM
+     % abilita/ disabilita obj operazioni se ci sono/non ci sono segnali nell'Asse selezionato MDM
 %
 % salvo l'indice dell'asse su cui mi sono appena spostato
 set(handles.lb_Ax, 'UserData', vNew)
@@ -1944,6 +1942,7 @@ tAssi(v).sigName = c;
 set(handles.pb_draw, 'UserData',tAssi)
 
 catch Me
+    
 end
 return
 
@@ -2517,40 +2516,41 @@ UserData = get(gcbf,'UserData');
    
  %Teoresi (cancello canale nella lista canali e nell'UserData)
 function delete_channel_Callback(hObject, eventdata, handles)
-% rimuove l'argomento selezionato dall'UserData
-UD = get(gcbf, 'UserData');
-L_file = length(fieldnames(UD.tTH));
-vKill = get(handles.lb_avail, 'Value');
-name_channel = get(handles.lb_avail, 'String');
-if ischar(name_channel)
-    name_channel = {get(handles.lb_avail, 'String')};    
-end
-    name_channel_kill = name_channel(vKill);
-    nKill = length(name_channel_kill);    
-for k=1:L_file
-%     tTH_k = UD.tTH.(['tTH_',num2str(k)]);
-    for i=1:nKill
-        name_channel_kill_1 = name_channel_kill{i};        
-        if isfield(UD.tTH.(['tTH_',num2str(k)]), name_channel_kill_1)
-            UD.tTH.(['tTH_',num2str(k)]) = rmfield(UD.tTH.(['tTH_',num2str(k)]), name_channel_kill_1);
+    % rimuove l'argomento selezionato dall'UserData
+    UD = get(gcbf, 'UserData');
+    L_file = length(fieldnames(UD.tTH));
+    vKill = get(handles.lb_avail, 'Value');
+    name_channel = get(handles.lb_avail, 'String');
+    if ischar(name_channel)
+        name_channel = {get(handles.lb_avail, 'String')};    
+    end
+        name_channel_kill = name_channel(vKill);
+        nKill = length(name_channel_kill);    
+    for k=1:L_file
+    %     tTH_k = UD.tTH.(['tTH_',num2str(k)]);
+        for i=1:nKill
+            name_channel_kill_1 = name_channel_kill{i};        
+            if isfield(UD.tTH.(['tTH_',num2str(k)]), name_channel_kill_1)
+                UD.tTH.(['tTH_',num2str(k)]) = rmfield(UD.tTH.(['tTH_',num2str(k)]), name_channel_kill_1);
+            end
         end
     end
-end
-set(gcbf, 'UserData', UD);
+    set(gcbf, 'UserData', UD);
 
-b = [];
-for i=1:nKill
-    a = find(strcmp(name_channel, name_channel_kill(i)));
-    b = [b; a];    
-end
-set(handles.lb_avail, 'Value', b);
+    b = [];
+    for i=1:nKill
+        a = find(strcmp(name_channel, name_channel_kill(i)));
+        b = [b; a];    
+    end
+    set(handles.lb_avail, 'Value', b);
 
-% rimuove l'argomento selezionato dalla lb_avail
-[bEmpty] = remOneLB(handles.lb_avail);
-  if bEmpty
-      % disattivo edit delle grandezze selezionate
-      disattivaEditSelez(handles)
-  end
+    % rimuove l'argomento selezionato dalla lb_avail
+    [bEmpty] = remOneLB(handles.lb_avail);
+    EnbDisSelez(handles);
+%   if bEmpty
+%       % disattivo edit delle grandezze selezionate
+%       disattivaEditSelez(handles)
+%   end
 
   
   %Teoresi (effettuo l'operazioni fra canali, inserendola in Operation List e salvandola nella lista canali)
@@ -2857,28 +2857,29 @@ set(gcbf, 'UserData', UserData);
 
 %Teoresi (cancello canale in operation list)
 function pushbutton50_Callback(hObject, eventdata, handles)
-if isfield(handles, 'edit_name')
- if not(isempty(handles.edit_name))
-    cQuant = handles.edit_name; % è sempre una cella
-    % if ischar(cQuant)
-    %     cQuant = {handles.edit_name};
-    % end
-    %
-    L = length(cQuant);
-    bIdxNew = true(L,1);
-    vKill = get(handles.listbox_operations, 'value');
-    bIdxNew(vKill) = false;
-    cQuant = cQuant(bIdxNew);
-    handles.edit_name = cQuant;
-    guidata(hObject, handles)
- end
-end
+    if isfield(handles, 'edit_name')
+     if not(isempty(handles.edit_name))
+        cQuant = handles.edit_name; % è sempre una cella
+        % if ischar(cQuant)
+        %     cQuant = {handles.edit_name};
+        % end
+        %
+        L = length(cQuant);
+        bIdxNew = true(L,1);
+        vKill = get(handles.listbox_operations, 'value');
+        bIdxNew(vKill) = false;
+        cQuant = cQuant(bIdxNew);
+        handles.edit_name = cQuant;
+        guidata(hObject, handles)
+     end
+    end
 
-[bEmpty] = remOneLB(handles.listbox_operations);
-   if bEmpty
-      % disattivo edit delle grandezze selezionate
-      disattivaEditSelez(handles)
-   end
+    [bEmpty] = remOneLB(handles.listbox_operations);
+    EnbDisSelez(handles);
+%    if bEmpty
+%       % disattivo edit delle grandezze selezionate
+%       disattivaEditSelez(handles)
+%    end
 
 
 % Teoresi (larghezza immagine totale plot)
@@ -2970,20 +2971,35 @@ function DebugBtt_Callback(hObject, eventdata, handles)
 % hObject    handle to DebugBtt (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+disp('sono qua')
 UD = get(gcbf, 'UserData');
 assignin('base', 'UserData', UD);
 assignin('base', 'handles', handles);
+disp('ho finito')
 
 function risp = EnbDisSelez(handles)
+    % se ci sono assi vuoti non abilito la gestione degli ordini degli assi
+    % aggiorno la struttura pb_draw.UserData prima procedere
+    pbDrawUD = handles.pb_draw.UserData;
+    axesEmpty = 'on';
+    for i=1:length(pbDrawUD) 
+        if isempty(pbDrawUD(i).sigName{1})
+            axesEmpty = 'off';
+        end
+    end
+    set([handles.pb_up, handles.pb_down], 'enable', axesEmpty);
+    
+    % controlla se nell'asse selezionato ci sono segnali e abilita o disabilita alcuni obj
     try
-        risp = 1;
-            if handles.lb_exp.String{1} == ' ' % controllo se sono presnti dei segnali nell'asse selezionato
-                risp = 0;       
+        value = 'on'; risp = 1;
+            if strcmp(handles.lb_exp.String{1}, ' ') % controllo se sono presnti dei segnali nell'asse selezionato
+                value = 'off';  risp = 0;      
             end
         %   handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
-        set([handles.pb_up handles.pb_down...
-            handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
-            'enable', 'on')
+        set([handles.lb_man, handles.pb_rem, handles.pb_exp,...
+             handles.pb_exp, handles.lb_exp],...
+            'enable', value)
+         % setPanelEnable(handles.pan_color, value);
     catch Me
         dispError(Me)
     end
@@ -3002,15 +3018,13 @@ return
 % end
 % return
 % 
-function disattivaEditSelez(handles)
-try
-%     handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
-    set([handles.pb_up handles.pb_down...
-         handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
-   'enable', 'off')
-catch Me
-    dispError(Me)
-end
-return
-
-
+% function disattivaEditSelez(handles)
+% try
+% %     handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
+%     set([handles.pb_up handles.pb_down...
+%          handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
+%    'enable', 'off')
+% catch Me
+%     dispError(Me)
+% end
+% return
