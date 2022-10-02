@@ -23,7 +23,7 @@ function varargout = traceManager(varargin)
 
 % Edit the above text to modify the response to help traceManager
 
-% Last Modified by GUIDE v2.5 02-Oct-2022 13:18:08
+% Last Modified by GUIDE v2.5 02-Oct-2022 15:00:47
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -871,7 +871,8 @@ try
                 % creazione campo Stile linea
                 styles=get(handles.DashType, 'String');
                 styleSelected=styles(get(handles.DashType, 'Value'));
-                UD.tTH.(sF).(sQuant1).Lstyle = styleSelected;
+                
+%                 Mstyles=get(handles.MarkerType, 'String');
                 
                 set(handles.lb_avail,'string',list_channels);
                 set(handles.lb_avail,'UserData',UD_lb_avail);
@@ -934,6 +935,8 @@ try
             widthSelected = widths(get(handles.LineWidth, 'Value'));
             UD.tTH.(sF).(sQuant).Width = widthSelected;
             
+            MstyleSelected=styles(get(handles.MarkerType, 'Value'));
+            UD.tTH.(sF).(sQuant).Mstyle = MstyleSelected;
             set(gcbf, 'UserData', UD);
             return
         else
@@ -3028,3 +3031,49 @@ return
 %     dispError(Me)
 % end
 % return
+
+
+% --- Executes on selection change in MarkerType.
+function MarkerType_Callback(hObject, eventdata, handles)
+% hObject    handle to MarkerType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns MarkerType contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from MarkerType
+
+
+% --- Executes during object creation, after setting all properties.
+function MarkerType_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to MarkerType (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+% --- Executes on selection change in popupmenu16.
+function popupmenu16_Callback(hObject, eventdata, handles)
+% hObject    handle to popupmenu16 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns popupmenu16 contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from popupmenu16
+
+
+% --- Executes during object creation, after setting all properties.
+function popupmenu16_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to popupmenu16 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
