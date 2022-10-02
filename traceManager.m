@@ -757,11 +757,22 @@ try
                         UD.tTH.(sF).(sF1).t0 = UD.tTH.(sF).(sF1).v_org(1);
                     end
                 end
+            else
+                xSpace = handles.xSignalTab.Data; 
+                sXquant = xSpace{nMan}; 
+%                 bOrgData = [];
             end
             %
             % tempo interpolato o grandezza generica per asse X
+%             sx
+%             bOrgData
+%             sXquant
+% sF
+            try
             UD.tTH.(sF).(sXquant).v0 = val;  % per coerenza con graficazione dati
             UD.tTH.(sF).(sXquant).t0 = UD.tTH.(sF).(sXquant).v(1);
+            catch
+            end
             %
             % grandezze
             UD.tTH.(sF).(sQuant).v0 = str2num(get(handles.et_vertOffset, 'string'));
