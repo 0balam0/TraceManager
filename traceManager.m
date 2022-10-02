@@ -98,7 +98,8 @@ try
     
     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
 
-catch
+catch Me
+    dispError(Me)
     %
 end
 
@@ -154,11 +155,13 @@ hlu=get(hObject,'value');
          ' ';...
          ['Unit: ', UserData.tTH.(cF{idx(1)}).(sQuant).u]});        
             
-  catch
+   catch Me
+      dispError(Me)
       uiwait(msgbox('Could not perform required operation.','','warn','modal'))
    end
 
-catch
+catch 
+    dispError(Me)
 end
 
 return
@@ -260,10 +263,12 @@ try
       else
           set(handles.edit_new_channel,'string','');
       end
-   catch
+   catch Me
+       dispError(Me)
       uiwait(msgbox('Could not perform required operation.','','warn','modal'))
    end
-catch
+catch Me
+    dispError(Me)
 end
 
 return
@@ -293,7 +298,8 @@ try
    % attivo la modifica delle grandezze selezionate
 %    attivaEditSelez(handles);
 
-catch
+catch Me
+    dispError(Me)
 end
 return
 
@@ -305,7 +311,8 @@ try
       % disattivo edit delle grandezze selezionate
       disattivaEditSelez(handles)
    end
-catch
+catch Me
+    dispError(Me)
 end
 return
 
@@ -317,7 +324,8 @@ try
    set(handles.lb_exp, 'string', {' '})
    % disattivo edit delle grandezze selezionate
    disattivaEditSelez(handles)
-catch
+catch Me
+    dispError(Me)
 end
 return
 
@@ -428,7 +436,8 @@ try
       % visualizzo la tTH e attivo controlli per la sua gestione
       
    end
-catch
+catch Me
+    dispError(Me)
 end
 return
 %
@@ -539,7 +548,8 @@ try
                tTHc.(sField).d = tTH_k.(sField).d;
                tTHc.(sField).u = tTH_k.(sField).u;
             end
-         catch
+         catch Me
+             dispError(Me)
             disp(['Warning: problemi nel concatenare la grandezza "', sField, '"; passo alla successiva.']);
             if isfield(tTHc, sField)
                tTHc = rmfield(tTHc, sField);
@@ -558,7 +568,8 @@ try
    end
    delete(hD)
 
-catch
+catch Me
+    dispError(Me)
 end
 
 return
@@ -627,7 +638,8 @@ try
     while etime(clock, t0) < 0.5
     end
     delete(hD)
-catch
+catch Me
+    dispError(Me)
 end
 
 return
@@ -643,7 +655,8 @@ for i = 1:length(cF)
    sF = cF{i};
    try
       tTH.(sF).v = interp1q(tTH.time.v , tTH.(sF).v, time_i);
-   catch
+   catch Me
+       dispError(Me)
       continue
    end
 end
@@ -929,10 +942,12 @@ try
         
         % disable panel of line data settings
         setPanelEnable(handles.pan_color, 'off');
-    catch
+    catch Me
+        dispError(Me)
         uiwait(msgbox('Could not perform required operation','','warn','modal'))
     end
-catch
+catch Me
+    dispError(Me)
 end
 
 return
@@ -1050,10 +1065,12 @@ try
      
       % enable panel of settings
       setPanelEnable(handles.pan_color, 'on');
-   catch
+   catch Me
+       dispError(Me)
       uiwait(msgbox('Could not perform required operation','','warn','modal'))
    end
-catch
+catch Me
+    dispError(Me)
 end
 
 return
@@ -1126,7 +1143,8 @@ try
 set([handles.pb_up handles.pb_down handles.pb_sort handles.pb_sortInv...
    handles.pb_rem handles.pb_exp handles.pb_exp handles.tb_graph handles.lb_exp],...
    'enable', 'off')
-catch
+catch Me
+    dispError(Me)
 end
 return
 
@@ -1373,7 +1391,7 @@ try
        handles.xSignalTab.Data = tFile.xSpaces; 
    end
    
-catch
+catch Me
     dispError(Me);
     disp('impossible to retrieve all data needed for loading configuration')
 end
@@ -1408,7 +1426,7 @@ try
     visualizzaLimitiAsse(handles, UserData.tAx(1), vNew);
     visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
     visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
-catch
+catch Me
 end
 %
 % salvo l'indice dell'asse su cui mi sono appena spostato
@@ -1448,7 +1466,7 @@ try
    try
        % UserData.tAx potrebbe ancora non esieetre (nuovo...)
        visualizzaLimitiAsse(handles, UserData.tAx(1), L+1);
-   catch
+   catch Me
    end
    %
    % cancello la visualizzazione grandezze (asse nuovo è vuoto)
@@ -1458,7 +1476,7 @@ try
    % salvo il contenuto (vuoto) dell'asse appena creato
    memorizzaAsse(handles,vNew)
 
-catch
+catch Me
 end
 
 % salvo le infos dalla di Dati dalla figura
@@ -1542,7 +1560,7 @@ try
    % aggiorno lista grandezze e limiti
    visualizzaAsse(handles, Lnew)
    visualizzaLimitiAsse(handles, UserData.tAx(1), Lnew)
-catch
+catch Me
 end
 
 % salvo le infos dalla di Dati dalla figura
@@ -1644,7 +1662,7 @@ try
    %
    guidata(hObject,handles)
 
-catch
+catch Me
 end
 return
 
@@ -1926,7 +1944,7 @@ tAssi(v).sigName = c;
 % salvataggio struttura
 set(handles.pb_draw, 'UserData',tAssi)
 
-catch
+catch Me
 end
 return
 
@@ -1983,7 +2001,7 @@ try
     %
     set(handles.lb_exp ,'value',1)
     set(handles.lb_exp, 'string',c)
-catch
+catch Me
 end
 return
 
@@ -2000,7 +2018,7 @@ try
         vLimY = [NaN NaN NaN];
     end
     scriviLimitiAsse(handles, 'Y', vLimY)
-catch
+catch Me
 end
 
 function visualizzaLabelAsse(handles, tAx1, vAxY)
@@ -2016,7 +2034,7 @@ try
         sLabY = '';
     end
     set(handles.et_labAxisY, 'string', sLabY);
-catch
+catch Me
 end
 
 function visualizzaOrdineAsse(handles, tAx1, vAxY)
@@ -2032,7 +2050,7 @@ try
         sOrd = '';
     end
     set(handles.et_axisOrd, 'string', sOrd);
-catch
+catch Me
 end
 
 function pb_YlimitsOk_Callback(hObject, eventdata, handles)
