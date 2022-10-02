@@ -23,7 +23,7 @@ function varargout = traceManager(varargin)
 
 % Edit the above text to modify the response to help traceManager
 
-% Last Modified by GUIDE v2.5 14-Sep-2022 11:14:09
+% Last Modified by GUIDE v2.5 02-Oct-2022 12:19:39
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -221,47 +221,52 @@ try
 
       % Aggiornamento interfaccia proprietà Linee
       % STILE
-      if isfield(UserData.tTH.(cF{idx(1)}).(char(sQuant)),'Lstyle')
-          et_Style = char(UserData.tTH.(cF{idx(1)}).(char(sQuant)).Lstyle);
-          switch et_Style
-              case 'Solid'
-                  et_Style = 1;
-              case 'Dashed'
-                  et_Style = 2;
-              case 'Dotted'
-                  et_Style = 3;
-              case 'Dash-dot'
-                  et_Style = 4;
-              case 'None'
-                  et_Style = 5;
+      fprintf('stringa:_%s_', handles.lb_exp.String{1})
+      if ~(handles.lb_exp.String{1} == ' ') % se sono presenti segnali nella lista
+          disp('sono entrato')
+          if isfield(UserData.tTH.(cF{idx(1)}).(char(sQuant)),'Lstyle')
+              et_Style = char(UserData.tTH.(cF{idx(1)}).(char(sQuant)).Lstyle);
+              switch et_Style
+                  case 'Solid'
+                      et_Style = 1;
+                  case 'Dashed'
+                      et_Style = 2;
+                  case 'Dotted'
+                      et_Style = 3;
+                  case 'Dash-dot'
+                      et_Style = 4;
+                  case 'None'
+                      et_Style = 5;
+              end
+          else
+              et_Style = 1;
           end
-      else
-          et_Style = 1;
-      end
-      % WIDTH
-      if isfield(UserData.tTH.(cF{idx(1)}).(char(sQuant)),'Width')
-          et_Width = char(UserData.tTH.(cF{idx(1)}).(char(sQuant)).Width);
-          switch et_Width
-              case '1.5'
-                  et_Width = 1;
-              case '2'
-                  et_Width = 2;
-              case '2.5'
-                  et_Width = 3;
-              case '3'
-                  et_Width = 4;
+          % WIDTH
+          if isfield(UserData.tTH.(cF{idx(1)}).(char(sQuant)),'Width')
+              et_Width = char(UserData.tTH.(cF{idx(1)}).(char(sQuant)).Width);
+              switch et_Width
+                  case '1.5'
+                      et_Width = 1;
+                  case '2'
+                      et_Width = 2;
+                  case '2.5'
+                      et_Width = 3;
+                  case '3'
+                      et_Width = 4;
+              end
+          else
+              et_Width = 1;
           end
-      else
-          et_Width = 1;
-      end
-      set(handles.DashType, 'Value', et_Style);
-      set(handles.LineWidth, 'Value', et_Width);
+          set(handles.DashType, 'Value', et_Style);
+          set(handles.LineWidth, 'Value', et_Width);
 
-      popup_menu = get(handles.popupmenu_operazioni, 'value');
-      if popup_menu > 1
-          popupmenu_operazioni_Callback(handles.popupmenu_operazioni, eventdata, handles)
-      else
-          set(handles.edit_new_channel,'string','');
+          popup_menu = get(handles.popupmenu_operazioni, 'value');
+      
+          if popup_menu > 1
+              popupmenu_operazioni_Callback(handles.popupmenu_operazioni, eventdata, handles)
+          else
+              set(handles.edit_new_channel,'string','');
+          end
       end
    catch Me
        dispError(Me)
@@ -309,6 +314,7 @@ try
    [bEmpty] = remOneLB(handles.lb_exp);
    if bEmpty
       % disattivo edit delle grandezze selezionate
+      EnbDisSelez(handles)
       disattivaEditSelez(handles)
    end
 catch Me
@@ -1137,17 +1143,6 @@ end
 
 return
 
-function disattivaEditSelez(handles)
-
-try
-set([handles.pb_up handles.pb_down handles.pb_sort handles.pb_sortInv...
-   handles.pb_rem handles.pb_exp handles.pb_exp handles.tb_graph handles.lb_exp],...
-   'enable', 'off')
-catch Me
-    dispError(Me)
-end
-return
-
 function s = eliminaCaratteri(s)
 % tolgo caratteri strani dal nome
 sChar = '\/.,;:';
@@ -1405,6 +1400,8 @@ function lb_Ax_Callback(hObject, eventdata, handles)
 % salvo il contenuto dell'asse da cui mi sono appena spostato
 
 % recupero le infos dalla di Dati dalla figura
+
+    
 UserData = get(gcbf,'UserData');
 
 vOld = get(handles.lb_Ax, 'UserData'); % valore precedente della lista
@@ -1427,7 +1424,9 @@ try
     visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
     visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
 catch Me
+  dispError(Me)
 end
+    EnbDisSelez(handles) % abilita/ disabilita obj operazioni se ci sono/non ci sono segnali nell'Asse selezionato MDM
 %
 % salvo l'indice dell'asse su cui mi sono appena spostato
 set(handles.lb_Ax, 'UserData', vNew)
@@ -2336,27 +2335,27 @@ return
 
 % Teoresi(popupmenu per le operazioni matematica tra più canali )
 function popupmenu_operazioni_Callback(hObject, eventdata, handles)
+     popup_sel_index = get(hObject, 'Value');
+     if popup_sel_index > 1
+        set(handles.uipanel14, 'Visible','on');
+        set(handles.listbox_operations,'Visible','on');
+        set(handles.teo_der,'value',0);
+        set(handles.teo_int,'value',0);    
+    %     set(handles.et_LPF, 'enable', 'off');
+    %     set(handles.et_vertGain, 'enable', 'off');
 
- popup_sel_index = get(hObject, 'Value');
- if popup_sel_index > 1
-    set(handles.uipanel14, 'Visible','on');
-    set(handles.listbox_operations,'Visible','on');
-    set(handles.teo_der,'value',0);
-    set(handles.teo_int,'value',0);    
-%     set(handles.et_LPF, 'enable', 'off');
-%     set(handles.et_vertGain, 'enable', 'off');
-    
-    if isfield(handles, 'edit_name1')
-        if not(isempty(handles.edit_name1'))
-            set(handles.edit_new_channel, 'String', handles.edit_name1);
-            return
+        if isfield(handles, 'edit_name1')
+            if not(isempty(handles.edit_name1'))
+                set(handles.edit_new_channel, 'String', handles.edit_name1);
+                return
+            end
         end
-    end
-    set(handles.edit_new_channel, 'String', '');
- else
-    set(handles.et_LPF, 'enable', 'on');
-    set(handles.et_vertGain, 'enable', 'on');
- end
+        set(handles.edit_new_channel, 'String', '');
+     else
+        set(handles.et_LPF, 'enable', 'on');
+        set(handles.et_vertGain, 'enable', 'on');
+     end
+
  
  % Teoresi(checkbox per le effettuare la derivata di un canale )
 function teo_der_Callback(hObject, eventdata, handles)
@@ -2964,3 +2963,54 @@ function dispError(Me)
     uiwait(msgbox({['ID: ' Me.identifier]; ['Message: ' Me.message]; mex}, 'Error','Error','modal'))
     mex = getReport(Me)
 return 
+
+
+% --- Executes on button press in DebugBtt.
+function DebugBtt_Callback(hObject, eventdata, handles)
+% hObject    handle to DebugBtt (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+UD = get(gcbf, 'UserData');
+assignin('base', 'UserData', UD);
+assignin('base', 'handles', handles);
+
+function risp = EnbDisSelez(handles)
+    try
+        risp = 1;
+            if handles.lb_exp.String{1} == ' ' % controllo se sono presnti dei segnali nell'asse selezionato
+                risp = 0;       
+            end
+        %   handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
+        set([handles.pb_up handles.pb_down...
+            handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
+            'enable', 'on')
+    catch Me
+        dispError(Me)
+    end
+return 
+    
+
+% function attivaEditSelez(handles)
+% disp('Sono Qua')
+% try
+% %   handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
+%     set([handles.pb_up handles.pb_down...
+%          handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
+%    'enable', 'on')
+% catch Me
+%     dispError(Me)
+% end
+% return
+% 
+function disattivaEditSelez(handles)
+try
+%     handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
+    set([handles.pb_up handles.pb_down...
+         handles.pb_rem handles.pb_exp handles.pb_exp handles.lb_exp],...
+   'enable', 'off')
+catch Me
+    dispError(Me)
+end
+return
+
+
