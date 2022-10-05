@@ -1345,11 +1345,11 @@ try
     % UserData.tAx potrebbe ancora non esistere (ex: non acnora fatto un
     % plot)
     % UserData.tAx.assi(1).Ylimit = [0 25 400]; % [yMin Step yMax]
-    if isfield(UserData, 'tAx') % disable panel of line data settings
-        visualizzaLimitiAsse(handles, UserData.tAx(1), vNew);
-        visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
-        visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
-    end
+%     if isfield(UserData, 'tAx') % disable panel of line data settings
+%         visualizzaLimitiAsse(handles, UserData.tAx(1), vNew);
+%         visualizzaLabelAsse(handles, UserData.tAx(1), vNew);
+%         visualizzaOrdineAsse(handles, UserData.tAx(1), vNew);
+%     end
     EnbDisSelez(handles);
 catch Me
   dispError(Me)
@@ -1398,7 +1398,7 @@ try
    %
    % cancello la visualizzazione grandezze (asse nuovo è vuoto)
    remAll(handles);
-   set(handles.tb_graph ,'enable','on')
+%    set(handles.tb_graph ,'enable','on')
    %
    % salvo il contenuto (vuoto) dell'asse appena creato
    memorizzaAsse(handles,vNew)
@@ -1868,7 +1868,7 @@ tAssi(v).sigName = c;
 set(handles.pb_draw, 'UserData',tAssi)
 
 catch Me
-    
+    dispError(Me)
 end
 return
 
@@ -1926,6 +1926,7 @@ try
     set(handles.lb_exp ,'value',1)
     set(handles.lb_exp, 'string',c)
 catch Me
+    dispError(Me)
 end
 return
 
@@ -1943,6 +1944,7 @@ try
     end
     scriviLimitiAsse(handles, 'Y', vLimY)
 catch Me
+    dispError(Me)
 end
 
 function visualizzaLabelAsse(handles, tAx1, vAxY)
@@ -1959,6 +1961,7 @@ try
     end
     set(handles.et_labAxisY, 'string', sLabY);
 catch Me
+    dispError(Me)
 end
 
 function visualizzaOrdineAsse(handles, tAx1, vAxY)
@@ -1966,15 +1969,18 @@ function visualizzaOrdineAsse(handles, tAx1, vAxY)
 try
     % assi(vNew)potrebbe non esistere (ex: ho appena creato un asse nuovo)
     % visualizzo label di assi X e Y nelle apposite caselle
-    set(handles.et_axisOrd, 'string', tAx1.assi(1).order);
-    if vAxY<=length(tAx1.assi)
-        sOrd = tAx1.assi(vAxY).order;
-    else
-        % ex: asse nuovo: limite nullo
-        sOrd = '';
+    if isfield(tAx1.assi(1),'order')
+        set(handles.et_axisOrd, 'string', tAx1.assi(1).order);
+        if vAxY<=length(tAx1.assi)
+            sOrd = tAx1.assi(vAxY).order;
+        else
+            % ex: asse nuovo: limite nullo
+            sOrd = '';
+        end
+        set(handles.et_axisOrd, 'string', sOrd);
     end
-    set(handles.et_axisOrd, 'string', sOrd);
 catch Me
+    dispError(Me)
 end
 
 function pb_YlimitsOk_Callback(hObject, eventdata, handles)
