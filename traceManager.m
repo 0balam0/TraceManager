@@ -1404,6 +1404,7 @@ try
    memorizzaAsse(handles,vNew)
 
 catch Me
+    dispError(Me)
 end
 
 % salvo le infos dalla di Dati dalla figura
