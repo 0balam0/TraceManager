@@ -23,7 +23,7 @@ function varargout = traceManager(varargin)
 
 % Edit the above text to modify the response to help traceManager
 
-% Last Modified by GUIDE v2.5 02-Oct-2022 17:08:51
+% Last Modified by GUIDE v2.5 06-Oct-2022 08:28:39
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -46,7 +46,7 @@ end
 
 return
 
-function traceManager_OpeningFcn(hObject, eventdata, handles, varargin)
+function traceManager_OpeningFcn(hObject, ~, handles, varargin)
 
 try
     % Choose default command line output for traceManager
@@ -97,7 +97,7 @@ try
     set(hObject, 'UserData',UserData);
     
     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
-
+    
 catch Me
     dispError(Me)
     %
@@ -1648,7 +1648,7 @@ cF = fieldnames(tTH);
 % (ex: k=1 acquisizione ECU; k=2 simulazione; k=3 acquisizione rullo)
 % tAx(k).assi(i).signals(j)
 for k = 1:length(cF)
-   tTH_k = tTH.(['tTH_',num2str(k)]);
+   tTH_k = tTH.(cF{k});
    [cTorgSet, cQorg, cTorg, cQint] = rfSdsMain('historyTimeFields', tTH_k);
    %
    % ciclo su assi
@@ -3042,3 +3042,12 @@ function LineWidth_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+% ----------------------------Menu function-------------------------------
+function Export_xlsx_txt(hObject, eventdata, handles)
+    UserData = get(gcbf,'UserData');
+    uiExport(UserData);
+%     uiwait(gcbf);
+    
+

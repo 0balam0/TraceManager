@@ -67,20 +67,12 @@ try
    guidata(hObject, handles);
    
    %create DataCursor button
-   
    tbar = handles.tbar;
    handles.ptDataCursor = uipushtool(tbar);
    load('.\ico\DataCursorICO.mat')
-%    handles.ptDataCursor.CData = ptImage;% pt.Icon = fullfile(matlabroot,'toolbox','matlab','icons','greencircleicon.gif');
    handles.ptDataCursor.CData = DataCursorICO;
-   %    assignin('base','tbar',tbar);
-%    handles.ptDataCursor.Tooltip = 'Add DataCursor';
-%    CreateCursorFun =@ CreateCursor(handles.figGraficoTH.UserData);
-% a = handles.figGraficoTH.UserData;
-   
    handles.ptDataCursor.ClickedCallback  = @(src,event)CreateCursor(src);
-%    disp('ciaop')
-   assignin('base', 'handle', handles)
+   
 catch
 end
 return
