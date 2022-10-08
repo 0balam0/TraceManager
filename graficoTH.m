@@ -22,7 +22,7 @@ function varargout = graficoTH(varargin)
 
 % Edit the above text to modify the response to help graficoTH
 
-% Last Modified by GUIDE v2.5 11-Apr-2020 18:47:15
+% Last Modified by GUIDE v2.5 09-Oct-2022 01:29:09
 
 % Begin initialization code - DO NOT EDIT
 try
@@ -319,9 +319,10 @@ try
    % disegno gli assi e il loro contenuto
    [handles, flag_yDoubled] = creaOggetti(handles, bForceZero);
    set(handles.tb_legend, 'state','off');
+   set(handles.flag_yDoubled, 'Value', flag_yDoubled);
    %
    % impagino gli assi nella figura
-   setPosizioniAssi(handles.figGraficoTH,[],handles, flag_yDoubled);
+   setPosizioniAssi(handles.figGraficoTH,[],handles);
    %
    % esporto l'handle della funzione di disegno assi x richiamare il
    % ridisegno dall'esterno
@@ -561,6 +562,7 @@ function setPosizioniAssi(hObject, eventdata, handles, flag_yDoubled)
 % suddivide lo spazio tra gli assi nella figura in parti uguali
 % sovrascrivo handles xè forse vuota
 
+flag_yDoubled = get(handles.flag_yDoubled, 'Value');
 %Teoresi (rendo invisibili inizialmente gli edit text con le dimensioni dei subplot)
 for i = 1:12
     pippo = ['edit_width' num2str(i)];
