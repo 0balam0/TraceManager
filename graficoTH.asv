@@ -317,11 +317,11 @@ try
    handles = guihandles(handles.figGraficoTH);
    %
    % disegno gli assi e il loro contenuto
-   [handles, flag_yDoubled] = creaOggetti(handles, bForceZero);
+   handles = creaOggetti(handles, bForceZero);
    set(handles.tb_legend, 'state','off');
    %
    % impagino gli assi nella figura
-   setPosizioniAssi(handles.figGraficoTH,[],handles, flag_yDoubled);
+   setPosizioniAssi(handles.figGraficoTH,[],handles);
    %
    % esporto l'handle della funzione di disegno assi x richiamare il
    % ridisegno dall'esterno
@@ -332,14 +332,13 @@ catch
 end
 return
 
-function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
+function handles = creaOggetti(handles, bForceZero)
 % recupero info dalla figura
 %
 
 
    UserData = get(handles.figGraficoTH, 'UserData');
    tAx = UserData.tAx;
-   flag_yDoubled = 0;
    %
    % richiamo figura corrente
    figure(handles.figGraficoTH)
@@ -421,7 +420,6 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                 if tAx(k).assi(i).signals(j).secAx
                     yyaxis 'right';
                     assignin('base', 'ax', hA);
-                    ylabel (['[', tAx(k).assi(i).signals(j).u, ']']);
                 else
                     yyaxis 'left'
                 end
@@ -477,14 +475,9 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
             end
             cLeg{length(cLeg)+1} = sLeg;
             % ripristino i colori degli assi
-            if tAx(k).assi(i).yDoubled
-                flag_yDoubled = 1;
-                if tAx(k).assi(i).signals(j).secAx
-                    set(hA.YAxis(2), 'Color', vColore);
-                end
-            end
+            set(hA.YAxis(2), 'Color', tAx(k).assi(i).signals(j).color) 
+            set(hA.YAxis(2), 'Label', ['[', tAx(k).assi(i).signals(j).u, ']']) 
             set(hA.YAxis(1), 'Color', [0.15, 0.15, 0.15]) 
-
             %%% setto limiti assi X e Y
             impostaLimitiAsse(hA, 'X', tAx(1).assi(1).Xlimit);
             impostaLimitiAsse(hA, 'Y', tAx(1).assi(i).Ylimit);
@@ -557,7 +550,7 @@ catch
 end
 return
 
-function setPosizioniAssi(hObject, eventdata, handles, flag_yDoubled)
+function setPosizioniAssi(hObject, eventdata, handles)
 % suddivide lo spazio tra gli assi nella figura in parti uguali
 % sovrascrivo handles xè forse vuota
 
@@ -571,10 +564,10 @@ end
 
 try
    % varie
-   bordoDx = 25 + (80-25)*flag_yDoubled;  %se esiste un grafico con due assi allora aumenta lo spazio a destra
+   bordoDx = 25;
    bordoSx = 80;
    bordoInf = 50;
-   bordoSup = 20; %20
+   bordoSup = 20;
    interlinea = 15; % 35
    set(handles.figGraficoTH, 'units','pixel');
    posFig = get(handles.figGraficoTH,'position');

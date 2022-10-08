@@ -1751,8 +1751,6 @@ for k = 1:length(cF)
             aXyDoubled = 1; 
          end
       end
-      %%% Aggiungo informazioni sul numero di assi Y grafico
-      tAx(k).assi(i).yDoubled = aXyDoubled;
       
       %%% limite asse Y (non sovrascrivo)
       if not(isfield(tAx(1).assi(i), 'Ylimit')) || length(tAx(1).assi(i).Ylimit) ~=3 
@@ -1770,7 +1768,11 @@ for k = 1:length(cF)
           % impongo pari all'ordine di creazione
           tAx(1).assi(i).order = [];
       end
-      
+      if aXyDoubled
+         for j = 1:length(tAssi(i).sigName) 
+            tAx(k).assi(i).signals(j)
+         end
+      end
    end
    % taglio struttura old troppo lunga
    tAx(k).assi = tAx(k).assi(1:length(tAssi));
@@ -2012,7 +2014,6 @@ if not(isfield(UserData, 'tAx'))
     memorizzaAsse(handles, get(handles.lb_Ax,'value'));
     tAssi = get(handles.pb_draw, 'UserData');
     UserData.tAx = crea_tAx(handles,struct(), tAssi, UserData.tTH, 'time'); %%Teoresi (handles)
-    
 end
  UserData.tAx(1).assi(1).Xlimit = vLimX; % il limite asse X è comune per tutti gli assi (scelgo il primo) e per tutti le manovre (scelgo la prima)
  UserData.tAx(1).assi(nAx).Ylimit = vLimY; % il limite asse Y è comune per tutti le manovre (scelgo la prima)
