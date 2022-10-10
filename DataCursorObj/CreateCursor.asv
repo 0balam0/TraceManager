@@ -171,8 +171,7 @@ set(gcf, 'WindowButtonMotionFcn',{@CursorWindowButtonMotionFcn});
 
 % Restore the axes on entry as the current axes
 axes(current);
-x=GetCursorLocation(fhandle, NumberOfCursor);
-dispDataCursor(Cursors{NumberOfCursor}, x);
+dispDataCursor(Cursors{n}, xPos);
 
 % add Cursor information 
 % axs = findobj(fhandle, 'type', 'axes');
@@ -182,7 +181,6 @@ dispDataCursor(Cursors{NumberOfCursor}, x);
 % Cursors{NumberOfCursor}.textInfo = t;
 return
 end
-
 %--------------------------------------------------------------------------
 function CursorButtonDownFcn(hObject, EventData, UserFunction) %#ok<INUSD>
 %--------------------------------------------------------------------------

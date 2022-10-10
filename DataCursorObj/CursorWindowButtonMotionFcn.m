@@ -27,88 +27,93 @@ function CursorWindowButtonMotionFcn(fhandle, EventData, UserFunction)
 % 30/01/08 now handles axes contained in a uipanel
 % Get axes under cursor
 ax=hittest(fhandle);
-if ~strcmp(get(ax, 'Type'), 'axes')
-    ax=ancestor(ax, 'axes');
-end
-if isempty(ax)
-    % Not over an axes - so reset pointer & return
-    % 15.11.09
-    %set(fhandle, 'Pointer', 'arrow');
-    return;
-end
-% Main code
-CData=[NaN	NaN	NaN	NaN	NaN	2	2	2	2	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	2	2	1	2	1	2	2	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	2	1	2	1	2	1	2	1	2	NaN	NaN	NaN	NaN;...
-    NaN	NaN	2	1	1	2	1	2	1	2	1	1	2	NaN	NaN	NaN;...
-    NaN	2	1	1	1	1	1	2	1	1	1	1	1	2	NaN	NaN;...
-    2	1	1	1	1	1	1	2	1	1	1	1	1	1	2	NaN;...
-    NaN	2	1	1	1	1	1	2	1	1	1	1	1	2	NaN	NaN;...
-    NaN	NaN	2	1	1	2	1	2	1	2	1	1	2	NaN	NaN	NaN;...
-    NaN	NaN	NaN	2	1	2	1	2	1	2	1	2	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	2	2	1	2	1	2	2	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	2	2	2	2	2	NaN	NaN	NaN	NaN	NaN	NaN;...
-    NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN];
-% Get objects associated with the cursors
-Cursors=getappdata(fhandle, 'VerticalCursors');
-h=[];
-for i=1:length(Cursors)
-    if ~isempty(Cursors{i})
-        h=horzcat(h,Cursors{i}.Handles);
-    end
-end
-% Return if there are none
-if isempty(h) || ~any(ishandle(h))
-    return
-end
-% We may be in the process of deleting the objects or their parents - use
-% only valid handles
-h=findobj(h, 'Type', 'line', 'Tag', 'Cursor', 'Parent', ax);
-h=h(ishandle(h));
-% Return if there are none
-if isempty(h)
-    return
-end
-% Get the axes position in pixels
-saveunits=get(ax, 'Units');
-set(ax, 'Units', 'pixels');
-axpos=get(ax, 'Position');
-set(ax, 'Units', saveunits);
-% Current point (axis units)
-pos=get(ax,'CurrentPoint');
-% Get the cursor positions (axis units)
-CursorPos=get(h,'XData');
-if iscell(CursorPos)
-    CursorPos=cell2mat(CursorPos);
-end
-% Remove offset and scale 0 to 1
-XLim=get(ax, 'XLim');
-CursorPos=(CursorPos-XLim(1))/(XLim(2)-XLim(1));
-pos=(pos-XLim(1))/(XLim(2)-XLim(1));
-% Convert to pixels
-CursorPos=CursorPos*axpos(3);
-pos=pos*axpos(3);
-% MATLAB selects an item when the pointer is within 5 pixels.
-% Change the pointer when we are within 3 pixels
-idx=find(abs(CursorPos(:,1)-pos(1))<3,1);
+try 
+    if strcmp(get(ax,'Type'),'line')
 
-if ~isempty(idx)
-    % Yes - activate the cursor pointer
-    %setptr(fhandle,'lrdrag');
-    
-    set(fhandle,'PointerShapeCData',CData);
-    set(fhandle,'Pointer','custom');
-    set(fhandle, 'PointerShapeHotSpot',[8 8]);
-    
-else
-    % No -
-    set(fhandle, 'Pointer', 'arrow');
-end
-    
+    if ~strcmp(get(ax, 'Type'), 'axes')
+        ax=ancestor(ax, 'axes');
+    end
+    if isempty(ax)
+        % Not over an axes - so reset pointer & return
+        % 15.11.09
+        %set(fhandle, 'Pointer', 'arrow');
+        return;
+    end
+    % Main code
+    CData=[NaN	NaN	NaN	NaN	NaN	2	2	2	2	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	2	2	1	2	1	2	2	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	2	1	2	1	2	1	2	1	2	NaN	NaN	NaN	NaN;...
+        NaN	NaN	2	1	1	2	1	2	1	2	1	1	2	NaN	NaN	NaN;...
+        NaN	2	1	1	1	1	1	2	1	1	1	1	1	2	NaN	NaN;...
+        2	1	1	1	1	1	1	2	1	1	1	1	1	1	2	NaN;...
+        NaN	2	1	1	1	1	1	2	1	1	1	1	1	2	NaN	NaN;...
+        NaN	NaN	2	1	1	2	1	2	1	2	1	1	2	NaN	NaN	NaN;...
+        NaN	NaN	NaN	2	1	2	1	2	1	2	1	2	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	2	2	1	2	1	2	2	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	2	1	2	1	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	2	2	2	2	2	NaN	NaN	NaN	NaN	NaN	NaN;...
+        NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN	NaN];
+    % Get objects associated with the cursors
+    Cursors=getappdata(fhandle, 'VerticalCursors');
+    h=[];
+    for i=1:length(Cursors)
+        if ~isempty(Cursors{i})
+            h=horzcat(h,Cursors{i}.Handles);
+        end
+    end
+    % Return if there are none
+    if isempty(h) || ~any(ishandle(h))
+        return
+    end
+    % We may be in the process of deleting the objects or their parents - use
+    % only valid handles
+    h=findobj(h, 'Type', 'line', 'Tag', 'Cursor', 'Parent', ax);
+    h=h(ishandle(h));
+    % Return if there are none
+    if isempty(h)
+        return
+    end
+    % Get the axes position in pixels
+    saveunits=get(ax, 'Units');
+    set(ax, 'Units', 'pixels');
+    axpos=get(ax, 'Position');
+    set(ax, 'Units', saveunits);
+    % Current point (axis units)
+    pos=get(ax,'CurrentPoint');
+    % Get the cursor positions (axis units)
+    CursorPos=get(h,'XData');
+    if iscell(CursorPos)
+        CursorPos=cell2mat(CursorPos);
+    end
+    % Remove offset and scale 0 to 1
+    XLim=get(ax, 'XLim');
+    CursorPos=(CursorPos-XLim(1))/(XLim(2)-XLim(1));
+    pos=(pos-XLim(1))/(XLim(2)-XLim(1));
+    % Convert to pixels
+    CursorPos=CursorPos*axpos(3);
+    pos=pos*axpos(3);
+    % MATLAB selects an item when the pointer is within 5 pixels.
+    % Change the pointer when we are within 3 pixels
+    idx=find(abs(CursorPos(:,1)-pos(1))<3,1);
+
+    if ~isempty(idx)
+        % Yes - activate the cursor pointer
+        %setptr(fhandle,'lrdrag');
+
+        set(fhandle,'PointerShapeCData',CData);
+        set(fhandle,'Pointer','custom');
+        set(fhandle, 'PointerShapeHotSpot',[8 8]);
+
+    else
+        % No -
+        set(fhandle, 'Pointer', 'arrow');
+    end
+
+    end
+catch
 end
 %----------------------------------------------------------------------
 % %-------------------------------------------------------------------
