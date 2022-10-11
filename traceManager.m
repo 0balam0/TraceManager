@@ -2976,7 +2976,7 @@ function refreshLinestyle(handles, tTHk, sQuant)
           if (isfield(tTHk.(sQuant),'Msize')) % Lstyle
               et_Msize = tTHk.(sQuant).Msize;
           else
-              et_Msize = '15';
+              et_Msize = '4';
           end 
           if (isfield(tTHk.(sQuant),'secAx')) 
               secAx = tTHk.(sQuant).secAx;
