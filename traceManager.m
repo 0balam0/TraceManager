@@ -680,31 +680,20 @@ try
         %      name_channel=get(handles.lb_exp, 'string');
         new_channel=get(handles.edit_new_channel,'string');
         
-        %     if iscell(name_channel)
-        %         name_channel=name_channel{val};
-        %     end
-        %
-        %     if iscell(name_channel1)
-        %         name_channel1=name_channel1{val};
-        %     end
-        %
         if iscell(new_channel)
             new_channel=new_channel{1};
         end
-        %
         % elimino un eventuale "-" per evitare problemi quando creo il campo associato all'operazione
         if contains(new_channel,'-')
             new_channel1= erase(new_channel,'-');
             new_channel=[new_channel1 '_neg'];
         end
-        %
         % elimino un eventuale "." per evitare problemi quando creo il campo associato all'operazione
         if contains(new_channel,'.')
             new_channel1= erase(new_channel,'.');
             new_channel=new_channel1;
         end
-        %
-        % Teoresi
+        % Teoresi Operazioni custom
         if popup_sel_index > 1 || check_der==1 || check_int==1
             if ischar(stringa)
                 stringa={stringa};
@@ -1737,7 +1726,7 @@ for k = 1:length(cF)
          %
          % import campi stile linea
          src = {'Lstyle', 'Width', 'Mstyle', 'Msize', 'secAx'};
-         dft = {'Solid', '1.5', 'none', '15', 0};
+         dft = {'Solid', '1.5', 'none', '4', 0};
          if isfield(tTH_k,(sField))
              for cc=1:length(src)
                  if isfield(tTH_k.(sField), src{cc})
@@ -2899,13 +2888,6 @@ function xSignalTab_CellSelectionCallback(hObject, eventdata, handles)
 %         assignin('base', 'handles', handles); 
     end 
 
-function dispError(Me)
-    mex = getReport(Me, 'extended','hyperlinks','off');
-    uiwait(msgbox({['ID: ' Me.identifier]; ['Message: ' Me.message]; mex}, 'Error','Error','modal'))
-    mex = getReport(Me)
-return 
-
-
 % --- Executes on button press in DebugBtt.
 function DebugBtt_Callback(hObject, eventdata, handles)
 % hObject    handle to DebugBtt (see GCBO)
@@ -2964,7 +2946,9 @@ function defineLineStyle(handles, UD, sF, sQuant)
         
         % salvo le informazioni nel tTH
         UD.tTH.(sF).(sQuant).color  = color;
-        UD.tTH.(sF).(sQuant).label  = label;
+        if ~isempty(label)
+            UD.tTH.(sF).(sQuant).label  = label;
+        end
         UD.tTH.(sF).(sQuant).Lstyle = styleSelected;
         UD.tTH.(sF).(sQuant).Mstyle = MstyleSelected;
         UD.tTH.(sF).(sQuant).Width  = widths;

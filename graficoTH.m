@@ -130,7 +130,7 @@ function esportaFigura(hFig, sFileFig, sFormat)
 % esporta la figura "hFig" nel file "sFileFig" come nel formato indicato in sFormat,
 % moltiplicando la risoluzione della figura mostrata a video per 2
 % esempi opzioni sFormat: -djpegXX; -dmeta; -dtiff
-% XX è un numero variabile tra 0 e 99 indicante la qualità del jpg
+% XX ? un numero variabile tra 0 e 99 indicante la qualit? del jpg
 % (default:90; migliore: 95)
 
 try
@@ -351,8 +351,7 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
    % ciclo sugli assi
    L = length(tAx(1).assi);
    hAssi = zeros(L,1);
-
-   % controllo se ho selezionato il confronto di più manovre o la singola
+   % controllo se ho selezionato il confronto di pi? manovre o la singola
    % manovra
    bOneMan = length(tAx)==1;
 
@@ -364,6 +363,7 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
    for i = 1:L
       iAx = vOrd(i); % ordine dell'asse
       hA = axes;
+      hold(hA,'on');
       sTagAx =  num2str(iAx);
       if i <= 9
           sTagAx = ['0', sTagAx];
@@ -371,6 +371,7 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
           sTagAx = sTagAx;
       end
       [sFontName, dFontSize, sFontWeight] = setFont(get(hA,'type'));
+%       sFontName %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
       set(hA, 'FontName',sFontName, 'FontSize',dFontSize, 'FontUnits','points','FontWeight',sFontWeight,...
          'xGrid','on', 'yGrid','on', 'zGrid','on', 'GridAlpha', 0.3, ...
          'Units','pixel', 'ButtonDownFcn','', 'Parent', handles.figGraficoTH, 'Tag',['ax_',sTagAx]);
@@ -421,21 +422,23 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
             if tAx(k).assi(i).yDoubled
                 if tAx(k).assi(i).signals(j).secAx
                     yyaxis 'right';
-                    assignin('base', 'ax', hA);
                     ylabel (['[', tAx(k).assi(i).signals(j).u, ']']);
                 else
-                    yyaxis 'left'
+                    yyaxis 'left';
                 end
             end
-       
-            hL = line(val_x, val_y);
-                       
+             if ~strcmp(tAx(k).assi(i).signals(j).Lstyle, 'Area')
+                hL = line(val_x, val_y);
+             else
+                hL = area(val_x, val_y);
+             end
+                  
             if isempty(hL)
                continue
             end
             %
             % linee
-            sLineStyle = cLineStyle{min(1,length(cLineStyle))}; % ad ogni grandezza in uno stesso asse è associato un solo stile di linea
+            sLineStyle = cLineStyle{min(1,length(cLineStyle))}; % ad ogni grandezza in uno stesso asse ? associato un solo stile di linea
             if isfield(tAx(k).assi(i).signals(j), 'color') && not(isempty(tAx(k).assi(i).signals(j).color))
                 vColore = tAx(k).assi(i).signals(j).color;
             else
@@ -443,8 +446,8 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                     % una sola manovra
                     vColore = sceltaColore(cColor,j); % in uno stesso asse il colore cambia con la grandezza
                 else
-                    % confronto di più manovre
-                    vColore = sceltaColore(cColor,k); % ad ogni manovra è associato lo stesso colore
+                    % confronto di pi? manovre
+                    vColore = sceltaColore(cColor,k); % ad ogni manovra ? associato lo stesso colore
                 end
             end
             
@@ -461,22 +464,28 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                     vStyle = ':';
                 case 'Dash-dot'
                     vStyle = '-.';
+                case 'Area'
+                    vStyle = 'None';
             end
             
             vWidth = str2num(vWidth);
-
-            set(hL, 'Color', vColore, 'LineWidth',vWidth, 'LineStyle',vStyle,...
+            if ~strcmp(tAx(k).assi(i).signals(j).Lstyle, 'Area')
+                set(hL, 'Color', vColore, 'LineWidth',vWidth, 'LineStyle',vStyle,...
                     'MarkerEdgeColor', vColore, 'MarkerFaceColor', vColore, 'MarkerSize', Msize, 'Marker', Mstyle,...
                     'ButtonDownFcn','', 'Parent',hA, 'Tag',['line_',num2str(i),'_',num2str(j),''], 'UserData', tAx(k).assi(i).signals(j).name);
-%             assignin('base','hl', hL)
+            else
+                set(hL, 'FaceColor', vColore, 'FaceAlpha', 0.2, 'EdgeAlpha', 0,...
+                'ButtonDownFcn','', 'Parent',hA, 'Tag',['line_',num2str(i),'_',num2str(j),''], 'UserData', tAx(k).assi(i).signals(j).name);
+            end 
+                %             assignin('base','hl', hL)
             % legenda
-            hLine(length(hLine)+1) = hL;
+            hLine(end+1) = hL;
             if isfield(tAx(k).assi(i).signals(j), 'label') && not(isempty(tAx(k).assi(i).signals(j).label))
                 sLeg = tAx(k).assi(i).signals(j).label;
             else
                 sLeg = tAx(k).assi(i).signals(j).name;
             end
-            cLeg{length(cLeg)+1} = sLeg;
+            cLeg{end+1} = sLeg;
             % ripristino i colori degli assi
             if tAx(k).assi(i).yDoubled
                 flag_yDoubled = 1;
@@ -484,18 +493,21 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                     set(hA.YAxis(2), 'Color', vColore);
                 end
             end
-            set(hA.YAxis(1), 'Color', [0.15, 0.15, 0.15]) 
+            set(hA.YAxis(1), 'Color', [0.15, 0.15, 0.15]);
 
             %%% setto limiti assi X e Y
             impostaLimitiAsse(hA, 'X', tAx(1).assi(1).Xlimit);
             impostaLimitiAsse(hA, 'Y', tAx(1).assi(i).Ylimit);
          end
       end
-      cLeg = cLeg(2:end);
+%       cLeg = cLeg(2:end);
       %
       % creo legenda predefinita
-      legend(hA, hLine, cLeg, 'interpreter','none');
-      legend(hA,'hide');
+      try
+          cLeg = cLeg(2:end);
+          legend(hA, hLine, cLeg, 'interpreter','none');
+          legend(hA,'hide');
+      end
    end
    %
    % lego limiti degli assi in direzione x per zoom
@@ -560,7 +572,7 @@ return
 
 function setPosizioniAssi(hObject, eventdata, handles, flag_yDoubled)
 % suddivide lo spazio tra gli assi nella figura in parti uguali
-% sovrascrivo handles xè forse vuota
+% sovrascrivo handles x? forse vuota
 
 flag_yDoubled = get(handles.flag_yDoubled, 'Value');
 %Teoresi (rendo invisibili inizialmente gli edit text con le dimensioni dei subplot)
@@ -592,6 +604,7 @@ try
    %
    % setto posizioni degli assi
    L = length(cAx); % numero di assi
+   
    pos(4) = (posFig(4) - bordoInf - bordoSup -(L-1)*interlinea)/L; % altezza dell'asse
    for i = L:-1:1 % parto dal primo asse in basso
       pos(1) = bordoSx;
