@@ -223,7 +223,10 @@ try
        % se sono presenti segnali nella lista
 
             for cc = 1:idx
-                refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant{1})
+                if iscell(sQuant)
+                    sQuant = sQuant{1}
+                end
+                refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant)
             end
            popup_menu = get(handles.popupmenu_operazioni, 'value');
       
@@ -666,7 +669,7 @@ try
         else
             sQuant = stringa{val};
         end
-
+        
         % estrazione nomi delle time-history lette nei files
         cF = fieldnames(UD.tTH); % ex: {'tTH_1', 'tTH_2'}
         sF = cF{nMan}; % ex: 'tTH_2'
@@ -693,7 +696,7 @@ try
             new_channel1= erase(new_channel,'.');
             new_channel=new_channel1;
         end
-        % Teoresi Operazioni custom
+        % Teoresi Operazioni channels Operation, derivata e integrale
         if popup_sel_index > 1 || check_der==1 || check_int==1
             if ischar(stringa)
                 stringa={stringa};
@@ -727,10 +730,10 @@ try
         edit_lpf=get(handles.et_LPF, 'string');
         
         if isfield(UD.tTH.(sF), sQuant)
-            %||~isempty(strfind(sQuant,'derivate'))
             % non devo aggiungere campi nel caso di scelta da interfaccia a
             % cazzo (capita se non ho selezionato prima la grandezza fra
             % quelle disp0nibili)
+            
             val = str2num(get(handles.et_timeManOffset, 'string'));
             if isempty(val)
                 val = UD.tTH.(sF).time.v0;
@@ -751,14 +754,9 @@ try
             else
                 xSpace = handles.xSignalTab.Data; 
                 sXquant = xSpace{nMan}; 
-%                 bOrgData = [];
+            % bOrgData = [];
             end
             %
-            % tempo interpolato o grandezza generica per asse X
-%             sx
-%             bOrgData
-%             sXquant
-% sF
             try
             UD.tTH.(sF).(sXquant).v0 = val;  % per coerenza con graficazione dati
             UD.tTH.(sF).(sXquant).t0 = UD.tTH.(sF).(sXquant).v(1);
@@ -835,12 +833,6 @@ try
                 %
                 UD.tTH.(sF).(sQuant1).color = leggiColoreLinea(handles);
                 UD.tTH.(sF).(sQuant1).label = get(handles.et_labLine, 'string');
-                
-                % creazione campo Stile linea
-%                 styles=get(handles.DashType, 'String');
-%                 styleSelected=styles(get(handles.DashType, 'Value'));
-                
-%                 Mstyles=get(handles.MarkerType, 'String');
                 
                 set(handles.lb_avail,'string',list_channels);
                 set(handles.lb_avail,'UserData',UD_lb_avail);
