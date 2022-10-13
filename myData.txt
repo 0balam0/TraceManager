@@ -1,6 +1,0 @@
-axis	nameSignal	Color	lineStyleV	Ystore	unit
-axis_1	EngineSpeed	[0.40,0.40,0.60]	-	4608	[1/min]
-axis_1	BSM_Comm_Fail_CANC	[0.00,0.45,0.74]	-	0	[1/min]
-axis_2	EngineSpeed	[0.40,0.40,0.60]	-	4608	[1/min]
-axis_2	EngineTorque	[0.85,0.33,0.10]	-	217	[1/min]
-all	time [s]	[1,1,1]	none	19.94	time [s]

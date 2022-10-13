@@ -22,7 +22,7 @@ function varargout = graficoTH(varargin)
 
 % Edit the above text to modify the response to help graficoTH
 
-% Last Modified by GUIDE v2.5 09-Oct-2022 01:29:09
+% Last Modified by GUIDE v2.5 13-Oct-2022 12:42:30
 
 % Begin initialization code - DO NOT EDIT
 try
@@ -43,7 +43,8 @@ try
       gui_mainfcn(gui_State, varargin{:});
    end
    
-catch
+catch Me
+   dispError(Me); 
 end
 return
 
@@ -67,13 +68,9 @@ try
    guidata(hObject, handles);
    
    %create DataCursor button
-   tbar = handles.tbar;
-   handles.ptDataCursor = uipushtool(tbar);
-   load('.\ico\DataCursorICO.mat')
-   handles.ptDataCursor.CData = DataCursorICO;
-   handles.ptDataCursor.ClickedCallback  = @(src,event)CreateCursor(src);
-   
-catch
+
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -121,7 +118,8 @@ try
       esportaFigura(handles.figGraficoTH, [sPath,sFile], sExt);
    end
 
-catch
+catch Me
+    dispError(Me); 
 end
 
 return
@@ -159,7 +157,8 @@ try
       print(hFig, sFormat, risoluzione, sFileFig);
    end
 
-catch
+catch Me
+    dispError(Me); 
 end
 
 return
@@ -183,7 +182,8 @@ try
    end
    set([handles.tb_zoomX handles.tb_zoomY], 'state','off')
 
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -260,7 +260,8 @@ try
          set(handles.(cL{j}), 'Marker',sMarker)
       end
    end
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -279,7 +280,8 @@ try
       legend(handles.(cAx{i}), s)
    end
 
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -329,7 +331,8 @@ try
    handles.fDisegna = @disegna; %str2func('disegna')
    guidata(handles.figGraficoTH,handles);
    %
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -531,7 +534,8 @@ try
          sFontWeight = 'bold';
       case ''
    end
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -566,7 +570,8 @@ try
       i = i-floor((i-1)/L)*L;
    end
    vColore = cColor{i};
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -634,7 +639,8 @@ try
       
       set(handles.uitoggletool9,'state','off')
    end
-catch
+catch Me
+    dispError(Me); 
 end
 
 return
@@ -649,7 +655,8 @@ try
       cNames1 = cNames;
    end
    cAx = sort(cNames1(strfindB(cNames1,'ax_')));
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -663,7 +670,8 @@ try
       cNames1 = cNames;
    end
    cL = sort(cNames1(strfindB(cNames1,'line_')));
-catch
+catch Me
+    dispError(Me); 
 end
 return
 
@@ -910,3 +918,13 @@ function edit_height12_Callback(hObject, ~, handles)
 A=get(hObject,'string');
 new_height_subplot=str2double(A);
 set(handles.ax_12, 'position',[handles.ax_12.Position(1),handles.ax_12.Position(2),handles.ax_12.Position(3),new_height_subplot]);
+
+
+% --------------------------------------------------------------------
+function tbar_ClickedCallback(hObject, eventdata, handles)
+%    tbar = handles.tbar;
+%    handles.ptDataCursor = uipushtool(tbar);
+%    load('.\ico\DataCursorICO.mat')
+%    handles.ptDataCursor.CData = DataCursorICO;
+   CreateCursor(hObject);
+   
