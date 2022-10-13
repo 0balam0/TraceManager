@@ -430,11 +430,11 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                     yyaxis 'left';
                 end
             end
-             if ~strcmp(tAx(k).assi(i).signals(j).Lstyle, 'Area')
-                hL = line(val_x, val_y);
-             else
+            if strcmp(tAx(k).assi(i).signals(j).Lstyle, 'Area')
                 hL = area(val_x, val_y);
-             end
+            else
+                hL = line(val_x, val_y);
+            end
                   
             if isempty(hL)
                continue
