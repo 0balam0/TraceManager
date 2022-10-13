@@ -23,7 +23,7 @@ function varargout = traceManager(varargin)
 
 % Edit the above text to modify the response to help traceManager
 
-% Last Modified by GUIDE v2.5 08-Oct-2022 22:29:20
+% Last Modified by GUIDE v2.5 13-Oct-2022 20:59:31
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -3021,15 +3021,17 @@ end
 function Export_xlsx_txt(hObject, eventdata, handles)
     UserData = get(gcbf,'UserData');
     uiExport(UserData);
-%     uiwait(gcbf);
-    
 
-
-
-% --- Executes on button press in secAx.
-function secAx_Callback(hObject, eventdata, handles)
-% hObject    handle to secAx (see GCBO)
+function calcBtt_Callback(hObject, eventdata, handles)
+% hObject    handle to calcBtt (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-% Hint: get(hObject,'Value') returns toggle state of secAx
+try
+    UserData = get(gcbf,'UserData');
+    app = custoOpApp();
+    
+    assignin('base', 'app', app);
+    app.start(UserData);
+catch Me
+    dispError(Me)
+end
