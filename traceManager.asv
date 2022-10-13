@@ -1650,9 +1650,6 @@ for k = 1:length(cF)
       % (ex: 1: VSSCD_v, 2: v_veh, 3: v_rullo)
       for j = 1:length(tAssi(i).sigName)              
         sField = tAssi(i).sigName{j};
-        
-        src = struct('name','', 'v',[], 'u', '', 't', [], 'color', [], 'label', '',...
-                'Lstyle', 'Solid', 'Width', '1.5', 'Mstyle', 'none', 'Msize', '4', 'secAx', 0);
       % Teoresi          
         if ischar(sField)
             sField = sField;
@@ -1662,8 +1659,8 @@ for k = 1:length(cF)
         if any(strcmp(fieldnames(tTH_k), sField))
             % controllo esistenza nella manovra/acquizione del segnale
             % richiesto per quell'asse
-            src.name = sField; 
-            src.u = tTH_k.(sField).u;
+            name = sField;
+            unit = tTH_k.(sField).u;
             %
             % scelgo la grandezza X da usare nel plot
             if strcmp(sXquant,'time') 
@@ -1686,29 +1683,59 @@ for k = 1:length(cF)
                 bOrgData = []; 
             end 
             
+            %Teoresi (cambio vettore time in base al tTH quando ho derivata/integrale)
+            
+%             str_comp1=strfind(tAssi(i).sigName(j),'derivative');
+%             str_comp2=strfind(tAssi(i).sigName(j),'integral');
+%             if ~isempty(str_comp1{1})||~isempty(str_comp2{1})
             if isfield(tTH_k.(sField), 'operation')
                 sF1 = tTH_k.(sField).sF;
                 tTH_k_new=tTH.(sF1);
-                [src.t, src.v] = applicaOffset(tTH_k_new.(sX), tTH_k.(sField), bOrgData);
+                [x, value] = applicaOffset(tTH_k_new.(sX), tTH_k.(sField), bOrgData);
+            %
             else
-                [src.t, src.v] = applicaOffset(tTH_k.(sX), tTH_k.(sField), bOrgData);
+                [x, value] = applicaOffset(tTH_k.(sX), tTH_k.(sField), bOrgData);
             end
-           
-            lineStyle = {'label', 'color', 'Lstyle', 'Width', 'Mstyle', 'Msize', 'secAx'};
-            for cc=1:length(lineStyle)
-                if isfield(tTH_k.(sField), lineStyle{cc})
-                    src.(lineStyle{cc}) = tTH_k.(sField).(lineStyle{cc});
-                end
+            color = tTH_k.(sField).color;
+            label = tTH_k.(sField).label;   
+             src = {'Lstyle', 'Width', 'Mstyle', 'Msize', 'secAx'};
+             dft = {'Solid', '1.5', 'none', '4', 0};
+             for cc=1:length(src)
+                 if isfield(tTH_k.(sField), src{cc})
+                     tAx(k).assi(i).signals(j).(src{cc}) = tTH_k.(sField).(src{cc});
+                 else
+                     tAx(k).assi(i).signals(j).(src{cc}) = dft{cc};
+                 end
+             end
+         else
+            % valori nulli se non lo trovo, non lo graficherò
+            src = stuct('name','', 'value',[], 'unit', '', 'x', [], 'color', [], 'label', '',...
+                'Lstyle', 'Solid', 'Width', '1.5', 'Mstyle', 'none', '''Msize', 'secAx'}
+            dft = {'', [], '', [], [], '', 'Solid', '1.5', 'none', '4', 0};
+%             name = '';
+%             value = [];
+%             unit = '';
+%             x = [];
+%             color = [];
+%             label = '';
+            for cc=1:length(src)
+                tAx(k).assi(i).signals(j).(src{cc}) = dft{cc};
             end
-        end
-        names = fieldnames(src);
-        for cc=1:length(names)
-            tAx(k).assi(i).signals(j).(names{cc}) = src.(names{cc});
-        end
-        if tAx(k).assi(i).signals(j).secAx  % Doppio asse Y
+         end
+         %
+         tAx(k).assi(i).signals(j).name = name;
+         tAx(k).assi(i).signals(j).v = value;
+         tAx(k).assi(i).signals(j).u = unit;
+         tAx(k).assi(i).signals(j).t = x;
+         tAx(k).assi(i).signals(j).color = color;
+         tAx(k).assi(i).signals(j).label = label;
+         %
+         % import campi stile linea
+
+         if tAx(k).assi(i).signals(j).secAx  % Doppio asse Y
             aXyDoubled = 1; 
-        end
-        tAx(k).assi(i)
+         end
+         
       end
       %%% Aggiungo informazioni sul numero di assi Y grafico
       tAx(k).assi(i).yDoubled = aXyDoubled;
