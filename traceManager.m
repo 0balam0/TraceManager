@@ -95,8 +95,12 @@ try
     % inizializzo gli UserData
     UserData = struct();
     set(hObject, 'UserData',UserData);
-    
     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
+    
+    % Creo app calcolatrice
+    handles.calcBtt.UserData =  customOpApp();
+    disp(handles.calcBtt.UserData);
+    handles.calcBtt.UserData.extFunction = @update_channel_list_lb_avail;  
     
 catch Me
     dispError(Me)
@@ -224,9 +228,11 @@ try
 
             for cc = 1:idx
                 if iscell(sQuant)
-                    sQuant = sQuant{1}
+                    sQuant = sQuant{1};
                 end
-                refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant)
+                if isfield(UserData.tTH.(cF{cc}), sQuant)
+                    refreshLinestyle(handles, UserData.tTH.(cF{cc}), sQuant)
+                end
             end
            popup_menu = get(handles.popupmenu_operazioni, 'value');
       
@@ -371,6 +377,7 @@ try
          end
          % salvo
          set(gcbf, 'UserData', UserData);
+         handles.calcBtt.UserData.loadUserData(UserData);
       end
 
    else
@@ -410,6 +417,8 @@ try
       set(gcbf, 'UserData', UserData);
       % visualizzo la tTH e attivo controlli per la sua gestione
       
+      % Load Data on calc 
+      handles.calcBtt.UserData.loadUserData(UserData);
    end
 catch Me
     dispError(Me)
@@ -3019,19 +3028,27 @@ end
 
 % ----------------------------Menu function-------------------------------
 function Export_xlsx_txt(hObject, eventdata, handles)
+gcbf
     UserData = get(gcbf,'UserData');
     uiExport(UserData);
 
 function calcBtt_Callback(hObject, eventdata, handles)
-% hObject    handle to calcBtt (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% visualizza la calcolatrice
 try
-    UserData = get(gcbf,'UserData');
-    app = custoOpApp();
-    
-    assignin('base', 'app', app);
-    app.start(UserData);
+    handles.calcBtt.UserData.show_hide_app('on');
 catch Me
     dispError(Me)
 end
+
+function update_channel_list_lb_avail(new_channel, handles)
+
+disp('asdsa')
+    if nargin == 1 
+        btt = gcbo
+        fig = btt.Parent
+        handles = get(fig, 'handles');
+    end
+    list_channels = get(handles.lb_avail, 'String');
+    list_channels{end+1}=new_channel
+%     set(handles.lb_avail,'string',list_channels);
+    

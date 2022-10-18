@@ -64,7 +64,12 @@ function funCalcCstOp(app)
                         plotCstOp(X, 0, risp, 2, nameS1, ' ', op);
                     end
                 else
-                    Y = tTH.(nameS2).v;
+                    
+                    try
+                        Y = eval(nameS2);
+                    catch ME
+                        Y = tTH.(nameS2).v;
+                    end
                     op =['X',opVal,'Y'];
                     risp = double(eval(op));
                     op = strrep(op,'X',nameS1); op = strrep(op,'Y',nameS2);
@@ -75,11 +80,21 @@ function funCalcCstOp(app)
         end
         app.addInfo(['=', op], 'add');
         
+        u = app.lbUnit.Value; d = app.lbDes.Value;
+        if isempty(u)
+        end
+        if isempty(d)
+            d = '-';
+        end
+        app.UD.tTH.(app.dB_tTH.Value).(app.lbOutSignal.Value) = struct('v', risp, 'u', u, 'd', d);
+        app.updateDataFun();
+        app.addInfo('Done!', 'n');
+        app.extFunction('CiaoMamma');
     catch Me
         app.addInfo('Calculation failed!!!','n');
         app.addInfo(Me.identifier, 'n');
         app.addInfo(Me.message,'n');
-        disp(Me)
+        dispError(Me)
     end
 end
 
