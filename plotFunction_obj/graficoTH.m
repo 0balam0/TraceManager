@@ -470,7 +470,6 @@ function [handles, flag_yDoubled] = creaOggetti(handles, bForceZero)
                 case 'Area'
                     vStyle = 'None';
             end
-            
             vWidth = str2num(vWidth);
             if ~strcmp(tAx(k).assi(i).signals(j).Lstyle, 'Area')
                 set(hL, 'Color', vColore, 'LineWidth',vWidth, 'LineStyle',vStyle,...

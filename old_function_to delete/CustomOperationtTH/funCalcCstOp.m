@@ -1,4 +1,4 @@
-function funCalcCstOp(app)
+function clcCstOpFun(app)
     opVal = get(app.dbOperation, 'Value');
     tTH = app.UD.tTH.(app.dB_tTH.Value);
 

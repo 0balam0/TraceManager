@@ -16,7 +16,15 @@ if ~isempty(x)
         for j=1:length(Cursor.TextInfo{i}.UserData)
             l = Cursor.TextInfo{i}.UserData(j);
             [~, id] = min(abs(l.XData - x));
-            color = l.Color;
+            try
+                color = l.Color;
+            catch
+                try 
+                    color = l.FaceColor;
+                catch
+                    color = [0,0,0];
+                end
+            end
             X = l.XData(id);
             Ystore(j) = l.YData(id);
             lineStyle = l.LineStyle;

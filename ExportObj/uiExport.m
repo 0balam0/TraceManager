@@ -54,35 +54,38 @@ function uiExport_OpeningFcn(hObject, eventdata, handles, varargin)
     set(handles.tTHtrgLbl,'Max', 99);
     % popolo sita degli assi
     hObject.UserData = struct();
-    set(hObject, 'UserData', varargin{1});
-    UD = varargin{1};
-    if isfield(UD, 'tAx')
-        if isfield(UD.tAx(1), 'assi')
-            set(handles.axesLst, 'String', mat2cell(1:length(UD.tAx(1).assi), 1,length(UD.tAx(1).assi)));
-        end
+    UD.tTH = varargin{1}.tTH;
+    UD.tFiles = varargin{1}.tFiles;
+    UD.slist = varargin{2};
+    set(hObject, 'UserData', UD);
+    
+    mat2cell(1:length(UD.slist), 1,length(UD.slist))
+    axName = mat2cell(1:length(UD.slist), 1,length(UD.slist));
+    for i=1:length(UD.slist)
+        axName{i} = ['asse ', num2str(i)];
     end
-    handles.axesLst.Value = 1:length(UD.tAx(1).assi);
+    set(handles.axesLst, 'String', axName);
+    handles.axesLst.Value = 1:length(UD.slist);
 
     % popolo lista tTH
-    if isfield(UD, 'tFiles')
-        tFiles = fieldnames(UD.tFiles);
-        names = mat2cell(1:length(tFiles), 1,length(tFiles));
-        for i = 1:length(tFiles)
-            [~,name,~] = fileparts(UD.tFiles.(tFiles{i}));
-            names{i} = name;
-        end
-        set(handles.tTHtrgLbl, 'String', names);
+    tFiles = fieldnames(UD.tFiles);
+    names = mat2cell(1:length(tFiles), 1,length(tFiles));
+    for i = 1:length(tFiles)
+        [~, name, ~] = fileparts(UD.tFiles.(tFiles{i}));
+        num = strsplit(tFiles{i},'_');
+        names{i} = [num{2},') ',name];
     end
-    handles.tTHtrgLbl.Value = 1:length(UD.tAx);
+    set(handles.tTHtrgLbl, 'String', names);
+    handles.tTHtrgLbl.Value = 1:length(names);
 
     set(hObject, 'Name', 'Export Data');
     %popolo la lista dei canali
     set(handles.chnLst, 'enable' , 'off')
     selectionMod(handles, hObject.UserData);
-    % controllo i filtri
+%     % controllo i filtri
     filterCheck_Callback(handles)
     ResCheck_Callback(handles)
-    assignin('base', 'UserData', hObject.UserData);
+%     assignin('base', 'UserDataF', hObject.UserData);
 
 
 % UIWAIT makes uiExport wait for user response (see UIRESUME)
@@ -147,25 +150,26 @@ function selectionMod(handles, UD)
             UD = get(gcbf,'UserData');
     end
     axesList = get(handles.axesLst, 'Value');
-    tTHlist  = get(handles.tTHtrgLbl, 'Value');
+    tTHlistVal  = get(handles.tTHtrgLbl, 'Value');
+    tTHlistStr  = get(handles.tTHtrgLbl, 'String');
     chList = {};
     chList{end+1} = 'time';
     try
-        for cc=1:length(tTHlist)
-            tTHn = tTHlist(cc);
-            tTHcfg = UD.tAx(tTHn).assi;
+        for cc=1:length(tTHlistVal)
+            tTHn = tTHlistVal(cc);
+            num = strsplit(tTHlistStr{tTHn},')');
+            tTH = UD.tTH.(['tTH_',num{1}]);
+            
             for j=1:length(axesList)
                 ax = axesList(j);
-                if ~isempty(tTHcfg(ax).signals)
-%                     tTHcfg(ax).signals.name
-                    for s=1:length(tTHcfg(ax).signals)
-                        if ~any(strcmp(chList, tTHcfg(ax).signals(s).name))
-                            if ~isempty(tTHcfg(ax).signals(s).name)
-                                chList{end+1} = tTHcfg(ax).signals(s).name;
-                            end
-                        end
+%                 fprintf('%d', ax)
+                for s=1:length(UD.slist(ax).sigName)
+%                     fprintf('\t%s', UD.slist(ax).sigName{s})
+                    if ~any(strcmp(chList,UD.slist(ax).sigName{s})) && isfield(tTH,UD.slist(ax).sigName{s} )
+                        chList{end+1} = UD.slist(ax).sigName{s};
                     end
                 end
+%                 fprintf('\n')
             end
         end
     catch Me
@@ -180,30 +184,31 @@ function save_to_file(handles, UD)
         if nargin ==1
             UD = get(gcbf,'UserData');
         end
-        tTHlist  = get(handles.tTHtrgLbl, 'Value'); %numero delle tTH selezionate
-        tFiles = fieldnames(UD.tFiles); % nome dei campi in tFiles contenti path tTH
-        [dir, name,~] = fileparts(UD.tFiles.(tFiles{tTHlist(1)})); 
-        if length(tTHlist) ~=1 % se è stata selezionata solo una tTH suggerisce il nome 
+        tTHlistVal  = get(handles.tTHtrgLbl, 'Value'); %numero delle tTH selezionate
+        tTHlistStr  = get(handles.tTHtrgLbl, 'String'); %numero delle tTH selezionate
+        tTHn = {};
+        for i=1:length(tTHlistStr)
+            tmp = strsplit(tTHlistStr{i},')');
+            tTHn{i} = tmp{1};
+        end
+        [dir, name,~] = fileparts(UD.tFiles.(['sFile_', tTHn{i}])); 
+        if length(tTHlistVal) ~=1 % se è stata selezionata solo una tTH suggerisce il nome 
             name = '*';
         end
 
-        [name, dir] = uiputfile({'*.xlsx'; '*.txt'; '*.hst'},'Select output file', strcat(dir, '\', name, '.xlsx')); 
+        [name, dir] = uiputfile({'*.xlsx'},'Select output file', strcat(dir, '\', name, '.xlsx')); 
 %         uiwait(gcbf)
         if ~isnumeric(name) % se è stato scelto un percorso 
             filename = strcat(dir,name);
             [~, ~, ext] = fileparts(name); % estensione del file scelta
-            if length(tTHlist)>1 && ~strcmp(ext, '.xlsx')
-                warndlg({'Cannot create ascii files with multiple tTHs.';...
-                         'Select one tTH or choose xlsx extension'},'Warning');
-            else
+            if strcmp(ext, '.xlsx')
                 wb = waitbar(0,'Please wait...');
                 tTH_names = fieldnames(UD.tTH); % nome dei campi tTH presenti nella configurazione UD
                 chnlst = get(handles.chnLst, 'String'); % nome dei segnali all'interno di chn litbox
-                for i = 1: length(tTHlist) % per ogni tTH selezionta
-                    waitbar(i/length(tTHlist), wb, 'Please wait...');
-                    n = tTHlist(i);
-                    tTH = UD.tTH.(tTH_names{n});
-                    [~, sheet,~] = fileparts(UD.tFiles.(tFiles{n})); 
+                for i = 1: length(tTHlistVal) % per ogni tTH selezionta
+                    waitbar(i/length(tTHlistVal), wb, 'Please wait...');
+                    tTH = UD.tTH.(['tTH_', tTHn{tTHlistVal(i)}]);
+                    [~, sheet,~] = fileparts(UD.tFiles.(['sFile_', tTHn{tTHlistVal(i)}])); 
                     Names = {}; Units  = {}; vals = [];
                     
                     [resample_flag, newTime] = funResample(handles, tTH);
@@ -216,7 +221,25 @@ function save_to_file(handles, UD)
                     [~, flt] = funFilter(handles, v);
                          
                     % controllo se è necessario filtrare
-                    
+                    nameFlagControll = 1;
+                    while nameFlagControll
+                        try
+                            xlswrite(filename, 1, sheet, 'A1');
+                            nameFlagControll = 0;
+                        catch Me
+                            if strcmp( Me.identifier, 'MATLAB:xlswrite:InvalidSheetName')
+                                answer = inputdlg([sheet,'  is not valid, please write a correct name!']);
+                                if ~isempty(answer)
+                                    sheet = answer{1};
+                                else
+                                    delete(wb)
+                                    return
+                                end
+                                nameFlagControll = 1;
+                            end
+                        end
+                    end
+                       
                     for j=1:length(chnlst) % per ogni nome della lista
                         if isfield(tTH, chnlst{j})
                             Names{end+1} = chnlst{j};
@@ -259,13 +282,19 @@ function save_to_file(handles, UD)
             delete(wb)
         end
     catch Me
-            mex = getReport(Me, 'extended','hyperlinks','off');
-        uiwait(msgbox({['ID: ' Me.identifier]; ['Message: ' Me.message]; mex}, 'Error','Error','modal'))
-        mex = getReport(Me)
-        fprintf('Qualcosa è andato storto durante il salvataggio!\n')
-        try
-            delete(wb)
-        end
+         switch Me.identifier
+             case 'MATLAB:xlswrite:InvalidSheetName'
+                disp('nome troppo lungo scegli alias');
+                delete(wb);
+                dispError(Me)
+             otherwise
+                 disp('ciao')
+                 dispError(Me)
+                 try
+                   delete(wb)
+                 end   
+         end
+      
     end
     
 %     uiputfile('c:\*.xlsx','Select output file');
