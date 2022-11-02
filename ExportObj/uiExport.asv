@@ -227,7 +227,7 @@ function save_to_file(handles, UD)
                             xlswrite(filename, 1, sheet, 'A1');
                             nameFlagControll = 0;
                         catch Me
-                            if strcmp( Me.identifier, 'MATLAB:xlswrite:InvalidSheetName') % se il nome non è compatibile con excel
+                            if strcmp( Me.identifier, 'MATLAB:xlswrite:InvalidSheetName') % se il nome non è 
                                 answer = inputdlg([sheet,'  is not valid, please write a correct name!']);
                                 if ~isempty(answer)
                                     sheet = answer{1};
@@ -237,11 +237,9 @@ function save_to_file(handles, UD)
                                 end
                                 nameFlagControll = 1;
                             else % qualcosa è andato storto ma almeno non si impalla il programma
-                                delete(wb);
-                                s = sprintf('something went wrong. cause: %s', Me.message);
-                                uiwait(warndlg(s,'Warning'));
+                                delete(wb):
                                 nameFlagControll = 0;
-                                return    
+                                    return    
                             end
                         end
                     end
@@ -288,10 +286,18 @@ function save_to_file(handles, UD)
             delete(wb)
         end
     catch Me
-        delete(wb)
-        s = sprintf('something went wrong. cause: %s', Me.message);
-        uiwait(warndlg(s,'Warning'));
-        dispError(Me);
+         switch Me.identifier
+             case 'MATLAB:xlswrite:InvalidSheetName'
+                disp('nome troppo lungo scegli alias');
+                delete(wb);
+                dispError(Me)
+             otherwise
+                 disp('ciao')
+                 dispError(Me)
+                 try
+                   delete(wb)
+                 end   
+         end
       
     end
     
@@ -318,7 +324,7 @@ return
 
 function [filter_flag, flt] = funFilter(handles, signal)
     filter_flag = false;
-    flt = 1:length(signal);
+    flt = ones(size(signal));
     if get(handles.filterCheck, 'Value')
         try
             fMin = str2double(get(handles.minFilt, 'String'));
@@ -328,7 +334,7 @@ function [filter_flag, flt] = funFilter(handles, signal)
         catch
             filter_flag = false;
         end
-            
+
     end
 return 
 
