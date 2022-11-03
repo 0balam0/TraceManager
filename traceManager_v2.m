@@ -23,7 +23,7 @@ function varargout = traceManager_v2(varargin)
 
 % Edit the above text to modify the response to help traceManager_v2
 
-% Last Modified by GUIDE v2.5 31-Oct-2022 17:10:58
+% Last Modified by GUIDE v2.5 03-Nov-2022 08:17:36
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -1680,6 +1680,7 @@ function pb_saveCfg_Callback(hObject, eventdata, handles)
     fun_pb_saveCfg_Callback(hObject, eventdata, handles)
 function pb_loadCfg_Callback(hObject, eventdata, handles)
     fun_pb_loadCfg_Callback(hObject, eventdata, handles)
+    
 %% --- Executes during object creation, after setting all properties.
 function pb_saveStyle_CreateFcn(hObject, eventdata, handles)
 
@@ -1784,10 +1785,16 @@ function pm_multiWnds_Callback(hObject, eventdata, handles)
     val = get(hObject, 'Value');
     obj = [handles.customXpanel, handles.claclPanel];
     set(obj, 'Visible', 'off')
-    
     set(obj(val), 'Visible', 'on');
 
 %% calculator
+function handles = clear_calc_data(handles) %handles = clear_calc_data;
+    % cancella operazione precendete e disabilita il pulsante salva;
+    set(handles.pb_Calculate, 'UserData', []); % cancello i dati del calcolo;
+    set(handles.pb_saveOperation, 'Visible', 'off');
+%     set(handles.lbl_outInfo, 'String', 'No calculation performed!')
+return
+
 function pop_file1Sel_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -1840,6 +1847,7 @@ end
 function pop_selOperation_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     handles = clcOpSelectedUpWin(handles);
+    handles = clear_calc_data(handles); % cancella operazione precedente
 
 function [tTH, tTHname] = get_tTH_clcSelected(hObject)
     lista = get(hObject, 'String');
@@ -1847,6 +1855,7 @@ function [tTH, tTHname] = get_tTH_clcSelected(hObject)
     tTHname = lista{val};
     UD = get(gcbf, 'UserData'); 
     tTH = UD.tTH.(tTHname);
+    handles = clear_calc_data(handles);
 return
 
 function lb_clcSng2_Callback(hObject, eventdata, handles)
@@ -1857,6 +1866,7 @@ function lb_clcSng2_Callback(hObject, eventdata, handles)
     numVal = str2num(val);
     u = '-';
     [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel);
+    handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if isempty(numVal) % allora ho inserito un nome di un segnale, controllo che esiste
         if ~isfield(tTH, val)
             s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. Restored default value: time', val, tTHname);
@@ -1879,6 +1889,7 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     val = get(hObject, 'String'); 
     [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel);
+    handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if ~isfield(tTH, val)
         s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. restored default value: time', val, tTHname);
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
@@ -1886,6 +1897,7 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     end
     set(hObject, 'String', val);
     set(handles.lb_opChan1Unit, 'String', tTH.(val).u);
+    
 function lb_outSingalName_Callback(hObject, eventdata, handles)
     val = get(hObject, 'String'); 
     if ~(isvarname(val)) % se non può essere creata una variabile con questo nome allora viene settato valore di default output_signal
@@ -1914,6 +1926,7 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
         UD = get(gcbf, 'UserData');
         [risp, handles] = clcCstOpFun(handles, UD.tTH);
         set(handles.pb_Calculate, 'UserData', risp);
+        set(handles.pb_saveOperation, 'Visible', 'on');
     catch Me
         dispError(Me, handles.lbl_infoBox);
         s = sprintf('Ops! qualcosa è andato storto');
@@ -1956,6 +1969,12 @@ function pb_saveOperation_Callback(hObject, eventdata, handles)
                 pm_filterUM_Callback(handles.pm_filterUM, [], handles);
              end
         end
+        set(handles.pb_Calculate, 'UserData', []); % cancello i dati del calcolo;
+        set(handles.pb_saveOperation, 'Visible', 'off'); % Nascondo il pulsante;
+        lst = get(handles.bp_outFileTarget, 'String'); % list output tTH
+        val = get(handles.bp_outFileTarget, 'Value');  % tTH di output selezionata
+        s = sprintf('Signal %s saved on %s', get(handles.lb_outSingalName,'String'), lst{val});
+        funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
     else
         s = sprintf('Warning! Perform a calculation before saving');
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
@@ -2127,3 +2146,12 @@ function funPPT_Guide_Callback(hObject, eventdata, handles)
 
 function funPDF_Guide_Callback(hObject, eventdata, handles)
     open('.\Help\Help_traceManager_v2.pdf');
+
+function pop_file1Sel_Callback(hObject, eventdata, handles)
+    val = get(hObject, 'Value');
+    set(handles.pop_file2Sel, 'Value', val);
+    set(handles.bp_outFileTarget, 'Value', val);
+    handles = clear_calc_data(handles); % cancella operazione precedente
+
+function pop_file2Sel_Callback(hObject, eventdata, handles)
+    handles = clear_calc_data(handles); % cancella operazione precedente

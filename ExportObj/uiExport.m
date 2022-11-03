@@ -292,7 +292,7 @@ function save_to_file(handles, UD)
         s = sprintf('something went wrong. cause: %s', Me.message);
         uiwait(warndlg(s,'Warning'));
         dispError(Me);
-      
+
     end
     
 %     uiputfile('c:\*.xlsx','Select output file');
