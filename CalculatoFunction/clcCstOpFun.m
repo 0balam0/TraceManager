@@ -1,4 +1,4 @@
-function [risp, app]= clcCstOpFun(app, tTHstore)
+function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
     risp = [];
     % get operator
     lista = get(app.pop_selOperation, 'String');
@@ -39,6 +39,26 @@ function [risp, app]= clcCstOpFun(app, tTHstore)
                 risp = eval(op);
                 op = strrep(op,'X',nameS1); op = strrep(op,'Y',nameS2);
                 
+            case 'Calc Tire Radius'
+                Y = tTH2.(nameS2).v;
+%                 f = questdlg('prova')
+                
+                [ratio, msg] = RatioReqObj('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
+                                                'tTH', tTH1);
+                waitfor(ratio, 'UserData');
+                RatioData = get(ratio, 'UserData');
+                delete(ratio);
+                if ~isempty(msg)
+                     funWriteToInfobox(handles.lbl_infoBox, msg, 'cell')
+                end
+                if isfield(RatioData, 'CalcAutogenRatios') %
+                    risp = (X/3.6)./(Y*2*pi/60./RatioData.CalcAutogenRatios.v);
+                    op = 'radius Tire';
+                else
+                    plotFlag = false; % non creo il plot
+                end
+
+       
 %             case '1D Interpolation' % selezionata la somma
 %                 mapName = app.extData.Value;
 %                 tab = app.UD.extData.tab.(mapName);
@@ -87,22 +107,17 @@ function [risp, app]= clcCstOpFun(app, tTHstore)
         
         if plotFlag
            plotStr = struct('sng',  struct('X', X, 'Y', Y, 'Z', risp),...
-                         'name', struct('nameX', nameS1, 'nameY', nameS2),...
-                         'opVal', opVal,...
-                         'op', op,...
-                         'type', 0);
+                            'name', struct('nameX', nameS1, 'nameY', nameS2),...
+                            'opVal', opVal,...
+                            'op', op,...
+                            'type', 0);
 
             app = clcPlotCstOp(plotStr, app);
         end
-        
-%         app.addInfo(['=', op], 'add');   
-%         app.addInfo('Done!', 'n');
-
     catch Me
-%         app.addInfo('Calculation failed!!!','n');
-%         app.addInfo(Me.identifier, 'n');
-%         app.addInfo(Me.message,'n');
         dispError(Me)
+        funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell')
+        
     end
 end
 

@@ -16,7 +16,8 @@ function app = clcOpSelectedUpWin(app)
            viewOpt = {'on', 'off', 'output signal = interp1(x_note, y_note, X)', 'on'};   
         case '2D Interpolation'
            viewOpt = {'on', 'on', 'output signal = interp2(x_note, y_note, val, X, Y)', 'on'};   
-           
+        case 'Calc Tire Radius'
+           viewOpt = {'on', 'on', 'output signal = f(X,Y); X=Vehicle speed; Y=EngineSpeed', 'off'}; 
         otherwise 
             if any(strcmp(opVal, {'abs', 'sin', 'cos', 'asin', 'acos', 'tan', 'atan'}))
                 viewOpt = {'on', 'off', ['output signal = ', opVal, '(X)'], 'off'}; 

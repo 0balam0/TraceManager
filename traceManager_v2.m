@@ -251,10 +251,10 @@ function read_tTH(hObject, eventdata, handles)
     if isfield(UD, 'tTH') % non sono mai state caticarte tTH ed è stato premuto back durante la selezione
         if ~isfield(UDpm, tTHname) && isfield(UD.tTH, tTHname)
             UDpm.(tTHname) = struct('xSngName', 'time',...
-                                             'fltSngName', 'time',...
-                                             'from', min(UD.tTH.(tTHname).time.v),...
-                                             'to',   max(UD.tTH.(tTHname).time.v),...
-                                             'enable', false, 'filter', false);      
+                                    'fltSngName', 'time',...
+                                    'from', min(UD.tTH.(tTHname).time.v),...
+                                    'to',   max(UD.tTH.(tTHname).time.v),...
+                                    'enable', false, 'filter', false);      
         end
         %% carico la lista delle tTH nelle diverse dropdox
         set(handles.pm_CstXtTH_selection, 'UserData', UDpm);
@@ -1806,7 +1806,7 @@ end
     opList = {'+', '-', '.*', './', '.^',...
               '==', '~=', '>', '>=', '<', '<=', '&', '|', '~',...
               'Integrate', 'Derivate', 'abs', 'sin', 'cos', 'asin', 'acos', 'tan', 'atan',...
-              '1D Interpolation', '2D Interpolation'};
+              '1D Interpolation', '2D Interpolation', 'Calc Tire Radius'};
     set(hObject, 'String', opList);
     set(hObject, 'Value', 1);
 
@@ -1924,7 +1924,7 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     try
         UD = get(gcbf, 'UserData');
-        [risp, handles] = clcCstOpFun(handles, UD.tTH);
+        [risp, handles] = clcCstOpFun(handles, UD.tTH, handles, gcbf);
         set(handles.pb_Calculate, 'UserData', risp);
         set(handles.pb_saveOperation, 'Visible', 'on');
     catch Me
@@ -1932,6 +1932,15 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
         s = sprintf('Ops! qualcosa è andato storto');
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
     end
+
+function pop_file1Sel_Callback(hObject, eventdata, handles)
+    val = get(hObject, 'Value');
+    set(handles.pop_file2Sel, 'Value', val);
+    set(handles.bp_outFileTarget, 'Value', val);
+    handles = clear_calc_data(handles); % cancella operazione precedente
+
+function pop_file2Sel_Callback(hObject, eventdata, handles)
+    handles = clear_calc_data(handles); % cancella operazione precedente
     
 function pb_loadExtData_Callback(hObject, eventdata, handles)
 function pb_saveOperation_Callback(hObject, eventdata, handles)
@@ -2147,11 +2156,4 @@ function funPPT_Guide_Callback(hObject, eventdata, handles)
 function funPDF_Guide_Callback(hObject, eventdata, handles)
     open('.\Help\Help_traceManager_v2.pdf');
 
-function pop_file1Sel_Callback(hObject, eventdata, handles)
-    val = get(hObject, 'Value');
-    set(handles.pop_file2Sel, 'Value', val);
-    set(handles.bp_outFileTarget, 'Value', val);
-    handles = clear_calc_data(handles); % cancella operazione precedente
 
-function pop_file2Sel_Callback(hObject, eventdata, handles)
-    handles = clear_calc_data(handles); % cancella operazione precedente
