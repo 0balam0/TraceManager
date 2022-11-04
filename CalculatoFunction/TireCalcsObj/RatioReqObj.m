@@ -155,5 +155,11 @@ return
 
 % --- Executes when user attempts to close figure1.
 function figure1_CloseRequestFcn(hObject, eventdata, handles)
+    UserData = get(hObject,'UserData');
+    if ~isfield(UserData,'CalcAutogenRatios') % ho premuto x prima di qualsiasi operazione
+        UserData.errore = [];
+        set(hObject, 'UserData', UserData);
+    end
+        
     set(hObject, 'Visible', 'off');
 %     delete(hObject);

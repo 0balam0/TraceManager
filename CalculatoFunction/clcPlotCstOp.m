@@ -28,6 +28,9 @@ function app = clcPlotCstOp(plotStr, app)
      elseif strcmp(plotStr.opVal, 'Calc Tire Radius')
          sp(1) = subplot(2,1,1);
          plot(sp(1), plotStr.sng.X, plotStr.sng.Z, 'LineWidth', 2);   ylabel(sp(1), plotStr.op);
+         sp(2) = subplot(2,1,2);
+         plotStr.sng.Y
+         plot(sp(2), plotStr.sng.X, plotStr.sng.Y, 'LineWidth', 2);   ylabel(sp(2), 'Ratio');
          xlabel(plotStr.name.nameX);
          
      else

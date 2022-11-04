@@ -53,6 +53,7 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
                 end
                 if isfield(RatioData, 'CalcAutogenRatios') %
                     risp = (X/3.6)./(Y*2*pi/60./RatioData.CalcAutogenRatios.v);
+                    Y = RatioData.CalcAutogenRatios.v;
                     op = 'radius Tire';
                 else
                     plotFlag = false; % non creo il plot

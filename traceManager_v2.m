@@ -1846,16 +1846,16 @@ end
 
 function pop_selOperation_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
-    handles = clcOpSelectedUpWin(handles);
-    handles = clear_calc_data(handles); % cancella operazione precedente
+    clcOpSelectedUpWin(handles);
+    clear_calc_data(handles); % cancella operazione precedente
 
-function [tTH, tTHname] = get_tTH_clcSelected(hObject)
+function [tTH, tTHname] = get_tTH_clcSelected(hObject, handles)
     lista = get(hObject, 'String');
     val   = get(hObject, 'Value');
     tTHname = lista{val};
     UD = get(gcbf, 'UserData'); 
     tTH = UD.tTH.(tTHname);
-    handles = clear_calc_data(handles);
+    clear_calc_data(handles);
 return
 
 function lb_clcSng2_Callback(hObject, eventdata, handles)
@@ -1865,7 +1865,7 @@ function lb_clcSng2_Callback(hObject, eventdata, handles)
     val = get(hObject, 'String'); 
     numVal = str2num(val);
     u = '-';
-    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel);
+    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel, handles);
     handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if isempty(numVal) % allora ho inserito un nome di un segnale, controllo che esiste
         if ~isfield(tTH, val)
@@ -1888,9 +1888,9 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     % reimpostato il valore di default.
     set(handles.pb_Calculate, 'UserData', []);
     val = get(hObject, 'String'); 
-    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel);
+    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel, handles);
     handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
-    if ~isfield(tTH, val)
+    if ~isfield(tTH, val) || isempty(val)
         s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. restored default value: time', val, tTHname);
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
         val = 'time';
