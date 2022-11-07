@@ -65,10 +65,11 @@ try
     end
     handles.hCaller = hCaller;
     %
+    
     guidata(hObject, handles);
     
     % version string
-    set(handles.figSalvaTH,'name','Trace Manager v2.0');
+    set(handles.figSalvaTH,'name','Trace Manager v2.02');
     
     % setto la grafica dell'interfaccia
     inizializzaInterfaccia(handles)
@@ -91,7 +92,8 @@ try
     % inizializzo gli UserData
     UserData = struct();
     set(hObject, 'UserData',UserData);
-    handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
+    
+%     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
             
 catch Me
     dispError(Me, handles.lbl_infoBox)

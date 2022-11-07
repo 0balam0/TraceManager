@@ -32,11 +32,11 @@ if ~isempty(x)
             strCum{j} = str;
         end
         Y = ((Cursor.TextInfo{i}.UserData(1).Parent.YLim(2)-...
-            Cursor.TextInfo{i}.UserData(1).Parent.YLim(1))/2)+...
-            Cursor.TextInfo{i}.UserData(1).Parent.YLim(1);
+            Cursor.TextInfo{i}.UserData(1).Parent.YLim(1))/2)+... 
+            Cursor.TextInfo{i}.UserData(1).Parent.YLim(1); % al centro del grafico
         if ~isempty(Cursor.TextInfo{i}.UserData)
             set(Cursor.TextInfo{i}, 'String', strCum,'interpreter', 'tex');
-            set(Cursor.TextInfo{i}, 'Position', [X, Y, 0]);
+            set(Cursor.TextInfo{i}, 'Position', [X+0.01*X, Y, 0]);
         end
     end
     LabelHandle=findobj(Cursor.Handles, 'Type', 'text');

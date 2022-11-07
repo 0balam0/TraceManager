@@ -23,7 +23,7 @@ function varargout = traceManager_v2(varargin)
 
 % Edit the above text to modify the response to help traceManager_v2
 
-% Last Modified by GUIDE v2.5 30-Oct-2022 11:40:49
+% Last Modified by GUIDE v2.5 03-Nov-2022 08:17:36
    
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -68,7 +68,7 @@ try
     guidata(hObject, handles);
     
     % version string
-    set(handles.figSalvaTH,'name','Trace Manager R2020_04')
+    set(handles.figSalvaTH,'name','Trace Manager v2.0');
     
     % setto la grafica dell'interfaccia
     inizializzaInterfaccia(handles)
@@ -113,26 +113,30 @@ try
    try
       % visualizzo nell'et_descr la descrizione della grandezza
       cCont = get(hObject, 'string');
-      sQuant = cCont{get(hObject, 'value')};
-      
-      %%% scrivo la descrizione nell'edit text
-      cF = fieldnames(UserData.tTH);
-      % ricerca della variabile fra le manovre
-      % ciclo sulle manovre
-      bOk = false(size(cF));
-      for i = 1:length(cF)
-         if isfield(UserData.tTH.(cF{i}), sQuant)
-            bOk(i) = true;
-         end
+      if ~isempty(cCont) 
+          sQuant = cCont{get(hObject, 'value')};
+
+          %%% scrivo la descrizione nell'edit text
+          cF = fieldnames(UserData.tTH);
+          % ricerca della variabile fra le manovre
+          % ciclo sulle manovre
+          bOk = false(size(cF));
+          for i = 1:length(cF)
+             if isfield(UserData.tTH.(cF{i}), sQuant)
+                bOk(i) = true;
+             end
+          end
+          idx = find(bOk);
+          % scrivo la descrizione della prima
+          set(handles.et_descr, 'string', {['Description: ', UserData.tTH.(cF{idx(1)}).(sQuant).d];...
+             ' ';...
+             ['Unit: ', UserData.tTH.(cF{idx(1)}).(sQuant).u]});         
       end
-      idx = find(bOk);
-      % scrivo la descrizione della prima
-      set(handles.et_descr, 'string', {['Description: ', UserData.tTH.(cF{idx(1)}).(sQuant).d];...
-         ' ';...
-         ['Unit: ', UserData.tTH.(cF{idx(1)}).(sQuant).u]});          
    catch Me
       dispError(Me, handles.lbl_infoBox)
-      uiwait(msgbox('Could not perform required operation.','','warn','modal'))
+      s = sprintf('Could not perform required operation!', get(hObject,'String'));
+      funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
+%       uiwait(msgbox('Could not perform required operation.','','warn','modal'))
    end
 catch 
     dispError(Me, handles.lbl_infoBox)
@@ -196,7 +200,7 @@ try
    set(handles.lb_exp, 'value',length(cQuantExp))
    % attivo la modifica delle grandezze selezionate
    EnbDisSelez(handles);
-   handleslb_exp_Callback;
+   lb_exp_Callback(handles.lb_exp, [], handles);
 catch Me
     dispError(Me, handles.lbl_infoBox)
 end
@@ -205,12 +209,14 @@ return
 function pb_rem_Callback(hObject, eventdata, handles)
 
 try
-   [bEmpty] = remOneLB(handles.lb_exp);
-   if bEmpty
-   % disattivo edit delle grandezze selezionate
-      EnbDisSelez(handles);
-%       disattivaEditSelez(handles)
-   end
+    [bEmpty] = remOneLB(handles.lb_exp);
+    if bEmpty
+        % disattivo edit delle grandezze selezionate
+        EnbDisSelez(handles);
+        %       disattivaEditSelez(handles)
+    else
+        lb_exp_Callback(handles.lb_exp, [], handles);
+    end
 catch Me
     dispError(Me, handles.lbl_infoBox)
 end
@@ -1498,9 +1504,10 @@ function risp = EnbDisSelez(handles)
                 value = 'off';  risp = 0;      
             end
         %   handles.pb_sort, handles.pb_sortInv, handles.tb_graph % rimosso questi obj non esitevano da set sotto
-        set([handles.lb_man, handles.pb_rem, handles.lb_exp],...
+        set([handles.lb_man; handles.pb_rem; handles.lb_exp;...
+            findobj(handles.pan_offset.Children,'type', 'UIControl');...   prp line, gain, offset, etc
+            findobj(handles.pan_colButt.Children,'type', 'UIControl')],... paletta colori
             'enable', value)
-         % setPanelEnable(handles.pan_color, value);
     catch Me
         dispError(Me, handles.lbl_infoBox)
     end
@@ -1673,6 +1680,7 @@ function pb_saveCfg_Callback(hObject, eventdata, handles)
     fun_pb_saveCfg_Callback(hObject, eventdata, handles)
 function pb_loadCfg_Callback(hObject, eventdata, handles)
     fun_pb_loadCfg_Callback(hObject, eventdata, handles)
+    
 %% --- Executes during object creation, after setting all properties.
 function pb_saveStyle_CreateFcn(hObject, eventdata, handles)
 
@@ -1777,10 +1785,16 @@ function pm_multiWnds_Callback(hObject, eventdata, handles)
     val = get(hObject, 'Value');
     obj = [handles.customXpanel, handles.claclPanel];
     set(obj, 'Visible', 'off')
-    
     set(obj(val), 'Visible', 'on');
 
 %% calculator
+function handles = clear_calc_data(handles) %handles = clear_calc_data;
+    % cancella operazione precendete e disabilita il pulsante salva;
+    set(handles.pb_Calculate, 'UserData', []); % cancello i dati del calcolo;
+    set(handles.pb_saveOperation, 'Visible', 'off');
+%     set(handles.lbl_outInfo, 'String', 'No calculation performed!')
+return
+
 function pop_file1Sel_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -1833,6 +1847,7 @@ end
 function pop_selOperation_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     handles = clcOpSelectedUpWin(handles);
+    handles = clear_calc_data(handles); % cancella operazione precedente
 
 function [tTH, tTHname] = get_tTH_clcSelected(hObject)
     lista = get(hObject, 'String');
@@ -1840,6 +1855,7 @@ function [tTH, tTHname] = get_tTH_clcSelected(hObject)
     tTHname = lista{val};
     UD = get(gcbf, 'UserData'); 
     tTH = UD.tTH.(tTHname);
+    handles = clear_calc_data(handles);
 return
 
 function lb_clcSng2_Callback(hObject, eventdata, handles)
@@ -1850,6 +1866,7 @@ function lb_clcSng2_Callback(hObject, eventdata, handles)
     numVal = str2num(val);
     u = '-';
     [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel);
+    handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if isempty(numVal) % allora ho inserito un nome di un segnale, controllo che esiste
         if ~isfield(tTH, val)
             s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. Restored default value: time', val, tTHname);
@@ -1872,6 +1889,7 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     val = get(hObject, 'String'); 
     [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel);
+    handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if ~isfield(tTH, val)
         s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. restored default value: time', val, tTHname);
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
@@ -1879,6 +1897,7 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     end
     set(hObject, 'String', val);
     set(handles.lb_opChan1Unit, 'String', tTH.(val).u);
+    
 function lb_outSingalName_Callback(hObject, eventdata, handles)
     val = get(hObject, 'String'); 
     if ~(isvarname(val)) % se non può essere creata una variabile con questo nome allora viene settato valore di default output_signal
@@ -1907,6 +1926,7 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
         UD = get(gcbf, 'UserData');
         [risp, handles] = clcCstOpFun(handles, UD.tTH);
         set(handles.pb_Calculate, 'UserData', risp);
+        set(handles.pb_saveOperation, 'Visible', 'on');
     catch Me
         dispError(Me, handles.lbl_infoBox);
         s = sprintf('Ops! qualcosa è andato storto');
@@ -1949,6 +1969,12 @@ function pb_saveOperation_Callback(hObject, eventdata, handles)
                 pm_filterUM_Callback(handles.pm_filterUM, [], handles);
              end
         end
+        set(handles.pb_Calculate, 'UserData', []); % cancello i dati del calcolo;
+        set(handles.pb_saveOperation, 'Visible', 'off'); % Nascondo il pulsante;
+        lst = get(handles.bp_outFileTarget, 'String'); % list output tTH
+        val = get(handles.bp_outFileTarget, 'Value');  % tTH di output selezionata
+        s = sprintf('Signal %s saved on %s', get(handles.lb_outSingalName,'String'), lst{val});
+        funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
     else
         s = sprintf('Warning! Perform a calculation before saving');
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
@@ -2113,3 +2139,19 @@ function MarkerSize_Callback(hObject, eventdata, handles)
         val = '1.5';
     end
     set(hObject, 'String', val);
+
+
+function funPPT_Guide_Callback(hObject, eventdata, handles)
+    open('.\Help\Help_traceManager_v2.pptx');
+
+function funPDF_Guide_Callback(hObject, eventdata, handles)
+    open('.\Help\Help_traceManager_v2.pdf');
+
+function pop_file1Sel_Callback(hObject, eventdata, handles)
+    val = get(hObject, 'Value');
+    set(handles.pop_file2Sel, 'Value', val);
+    set(handles.bp_outFileTarget, 'Value', val);
+    handles = clear_calc_data(handles); % cancella operazione precedente
+
+function pop_file2Sel_Callback(hObject, eventdata, handles)
+    handles = clear_calc_data(handles); % cancella operazione precedente
