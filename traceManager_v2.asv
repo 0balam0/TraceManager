@@ -65,10 +65,11 @@ try
     end
     handles.hCaller = hCaller;
     %
+    
     guidata(hObject, handles);
     
     % version string
-    set(handles.figSalvaTH,'name','Trace Manager v2.0');
+    set(handles.figSalvaTH,'name','Trace Manager v2.02');
     
     % setto la grafica dell'interfaccia
     inizializzaInterfaccia(handles)
@@ -91,7 +92,8 @@ try
     % inizializzo gli UserData
     UserData = struct();
     set(hObject, 'UserData',UserData);
-    handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
+    set(hObject, 'UserData',UserData);
+%     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
             
 catch Me
     dispError(Me, handles.lbl_infoBox)
@@ -251,10 +253,10 @@ function read_tTH(hObject, eventdata, handles)
     if isfield(UD, 'tTH') % non sono mai state caticarte tTH ed è stato premuto back durante la selezione
         if ~isfield(UDpm, tTHname) && isfield(UD.tTH, tTHname)
             UDpm.(tTHname) = struct('xSngName', 'time',...
-                                             'fltSngName', 'time',...
-                                             'from', min(UD.tTH.(tTHname).time.v),...
-                                             'to',   max(UD.tTH.(tTHname).time.v),...
-                                             'enable', false, 'filter', false);      
+                                    'fltSngName', 'time',...
+                                    'from', min(UD.tTH.(tTHname).time.v),...
+                                    'to',   max(UD.tTH.(tTHname).time.v),...
+                                    'enable', false, 'filter', false);      
         end
         %% carico la lista delle tTH nelle diverse dropdox
         set(handles.pm_CstXtTH_selection, 'UserData', UDpm);
@@ -1806,7 +1808,7 @@ end
     opList = {'+', '-', '.*', './', '.^',...
               '==', '~=', '>', '>=', '<', '<=', '&', '|', '~',...
               'Integrate', 'Derivate', 'abs', 'sin', 'cos', 'asin', 'acos', 'tan', 'atan',...
-              '1D Interpolation', '2D Interpolation'};
+              '1D Interpolation', '2D Interpolation', 'Calc Tire Radius'};
     set(hObject, 'String', opList);
     set(hObject, 'Value', 1);
 
@@ -1846,16 +1848,16 @@ end
 
 function pop_selOperation_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
-    handles = clcOpSelectedUpWin(handles);
-    handles = clear_calc_data(handles); % cancella operazione precedente
+    clcOpSelectedUpWin(handles);
+    clear_calc_data(handles); % cancella operazione precedente
 
-function [tTH, tTHname] = get_tTH_clcSelected(hObject)
+function [tTH, tTHname] = get_tTH_clcSelected(hObject, handles)
     lista = get(hObject, 'String');
     val   = get(hObject, 'Value');
     tTHname = lista{val};
     UD = get(gcbf, 'UserData'); 
     tTH = UD.tTH.(tTHname);
-    handles = clear_calc_data(handles);
+    clear_calc_data(handles);
 return
 
 function lb_clcSng2_Callback(hObject, eventdata, handles)
@@ -1865,7 +1867,7 @@ function lb_clcSng2_Callback(hObject, eventdata, handles)
     val = get(hObject, 'String'); 
     numVal = str2num(val);
     u = '-';
-    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel);
+    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file2Sel, handles);
     handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
     if isempty(numVal) % allora ho inserito un nome di un segnale, controllo che esiste
         if ~isfield(tTH, val)
@@ -1888,9 +1890,9 @@ function lb_clcSng1_Callback(hObject, eventdata, handles)
     % reimpostato il valore di default.
     set(handles.pb_Calculate, 'UserData', []);
     val = get(hObject, 'String'); 
-    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel);
+    [tTH, tTHname] = get_tTH_clcSelected(handles.pop_file1Sel, handles);
     handles = clear_calc_data(handles); %cancello i risultati precedenti se esistono
-    if ~isfield(tTH, val)
+    if ~isfield(tTH, val) || isempty(val)
         s = sprintf('Warning! Signal (%s) not found in %s, please enter a valid signal. restored default value: time', val, tTHname);
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
         val = 'time';
@@ -1924,7 +1926,7 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     try
         UD = get(gcbf, 'UserData');
-        [risp, handles] = clcCstOpFun(handles, UD.tTH);
+        [risp, handles] = clcCstOpFun(handles, UD.tTH, handles, gcbf);
         set(handles.pb_Calculate, 'UserData', risp);
         set(handles.pb_saveOperation, 'Visible', 'on');
     catch Me
@@ -1932,6 +1934,15 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
         s = sprintf('Ops! qualcosa è andato storto');
         funWriteToInfobox(handles.lbl_infoBox, {s}, 'n');
     end
+
+function pop_file1Sel_Callback(hObject, eventdata, handles)
+    val = get(hObject, 'Value');
+    set(handles.pop_file2Sel, 'Value', val);
+    set(handles.bp_outFileTarget, 'Value', val);
+    handles = clear_calc_data(handles); % cancella operazione precedente
+
+function pop_file2Sel_Callback(hObject, eventdata, handles)
+    handles = clear_calc_data(handles); % cancella operazione precedente
     
 function pb_loadExtData_Callback(hObject, eventdata, handles)
 function pb_saveOperation_Callback(hObject, eventdata, handles)
@@ -2147,11 +2158,4 @@ function funPPT_Guide_Callback(hObject, eventdata, handles)
 function funPDF_Guide_Callback(hObject, eventdata, handles)
     open('.\Help\Help_traceManager_v2.pdf');
 
-function pop_file1Sel_Callback(hObject, eventdata, handles)
-    val = get(hObject, 'Value');
-    set(handles.pop_file2Sel, 'Value', val);
-    set(handles.bp_outFileTarget, 'Value', val);
-    handles = clear_calc_data(handles); % cancella operazione precedente
 
-function pop_file2Sel_Callback(hObject, eventdata, handles)
-    handles = clear_calc_data(handles); % cancella operazione precedente

@@ -8,7 +8,7 @@
       <file>${PROJECT_ROOT}\TraceManagerV2_01_resources\icon_24.png</file>
       <file>${PROJECT_ROOT}\TraceManagerV2_01_resources\icon_16.png</file>
     </param.icons>
-    <param.version>2.01</param.version>
+    <param.version>2.02</param.version>
     <param.authnamewatermark />
     <param.email />
     <param.company />
@@ -21,10 +21,10 @@
     <param.logo />
     <param.install.notes />
     <param.target.install.notes />
-    <param.intermediate>${PROJECT_ROOT}\TraceManagerV2_01\for_testing</param.intermediate>
-    <param.files.only>${PROJECT_ROOT}\TraceManagerV2_01\for_redistribution_files_only</param.files.only>
-    <param.output>${PROJECT_ROOT}\TraceManagerV2_01\for_redistribution</param.output>
-    <param.logdir>${PROJECT_ROOT}\TraceManagerV2_01</param.logdir>
+    <param.intermediate>${PROJECT_ROOT}\TraceManagerV2_02\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\TraceManagerV2_02\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\TraceManagerV2_02\for_redistribution</param.output>
+    <param.logdir>${PROJECT_ROOT}\TraceManagerV2_02</param.logdir>
     <param.enable.clean.build>false</param.enable.clean.build>
     <param.user.defined.mcr.options />
     <param.embed.ctf>true</param.embed.ctf>
@@ -50,10 +50,6 @@
       <param.installpath.combo />
       <param.logo />
       <param.target.install.notes />
-      <param.intermediate />
-      <param.files.only />
-      <param.output />
-      <param.logdir />
       <param.enable.clean.build />
       <param.user.defined.mcr.options />
       <param.embed.ctf />
@@ -73,7 +69,10 @@
       <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\traceManager_v2.m</file>
     </fileset.main>
     <fileset.resources />
-    <fileset.package />
+    <fileset.package>
+      <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\Help</file>
+      <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\myData.txt</file>
+    </fileset.package>
     <fileset.depfun>
       <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\CalculatoFunction\clcCstOpFun.m</file>
       <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\CalculatoFunction\clcOpSelectedUpWin.m</file>
@@ -134,9 +133,9 @@
       <file>C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\TraceManager_v2_function\visualizzaListaAssi.m</file>
     </fileset.depfun>
     <build-deliverables>
-      <file location="${PROJECT_ROOT}\TraceManagerV2_01\for_testing" name="TraceManagerV2_01.exe" optional="false">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_01\for_testing\TraceManagerV2_01.exe</file>
-      <file location="${PROJECT_ROOT}\TraceManagerV2_01\for_testing" name="splash.png" optional="false">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_01\for_testing\splash.png</file>
-      <file location="${PROJECT_ROOT}\TraceManagerV2_01\for_testing" name="readme.txt" optional="true">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_01\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\TraceManagerV2_02\for_testing" name="splash.png" optional="false">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_02\for_testing\splash.png</file>
+      <file location="${PROJECT_ROOT}\TraceManagerV2_02\for_testing" name="readme.txt" optional="true">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_02\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\TraceManagerV2_02\for_testing" name="TraceManagerV2_01.exe" optional="false">C:\Users\Matteo\Desktop\StellaantisTool\TraceManager\ico\TraceManagerV2_02\for_testing\TraceManagerV2_01.exe</file>
     </build-deliverables>
     <workflow />
     <matlab>

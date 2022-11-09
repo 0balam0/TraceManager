@@ -58,32 +58,21 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
                 else
                     plotFlag = false; % non creo il plot
                 end
-
        
-%             case '1D Interpolation' % selezionata la somma
-%                 mapName = app.extData.Value;
-%                 tab = app.UD.extData.tab.(mapName);
-%                 x = tab.X; 
-%                 v = tab.Y;
-%                 xq = tTH.(nameS1).v;  xrpl = nameS1;
-%                 op = 'interp1(x,v,xq)';
-%                 risp = eval(op);
-%                 op = strrep(op,'xq',xrpl);
-%                 if app.plotFlag.Value
-%                     plotCstOp(x, v, risp, 5, 'xTab', 'yTab', 'interpolation', xq);
-%                 end
-%                 
-%             case '2D Interpolation'
-%                 mapName = app.extData.Value;
-%                 tab = app.UD.extData.tab.(mapName);
-%                 X = tab.X; 
-%                 Y = tab.Y;
-%                 V = tab.V;
-%                 Xq = tTH.(nameS1).v;  xrpl = nameS1;
-%                 Yq = tTH.(nameS2).v;  xrp2 = nameS2;
-%                 op = 'interp1(X,Y,V,Xq,Yq)';
-%                 risp = eval(op);
-%                 op = strrep(op,'Xq',xrpl); op = strrep(op,'Yq',xrp2);
+            case '1D Interpolation' % selezionata la somma
+                InterpData = loadInterpData_1D;
+                waitfor(InterpData, 'Visible');
+                UD = get(InterpData, 'UserData'); out = UD.out;
+                delete(InterpData);
+                if ~isempty(out)
+                    nameS2 = cell(2,1);  Y = cell(2,1);
+                    risp = interp1(out.x, out.y, X);
+                    Y{1} = out.x; Y{2}=out.y;
+                    op = 'Interpolation';
+                    nameS2{1} = out.x_name; nameS2{2} = out.y_name;
+                else
+                    plotFlag = false;
+                end
 
             otherwise
                 if any(strcmp(opVal, {'abs', 'sin', 'cos', 'asin', 'acos', 'tan', 'atan'}))
@@ -107,18 +96,22 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
         end
         
         if plotFlag
-           plotStr = struct('sng',  struct('X', X, 'Y', Y, 'Z', risp),...
-                            'name', struct('nameX', nameS1, 'nameY', nameS2),...
-                            'opVal', opVal,...
-                            'op', op,...
-                            'type', 0);
-
-            app = clcPlotCstOp(plotStr, app);
+            try
+               plotStr = struct('sng',  struct('X', X, 'Y', Y, 'Z', risp),...
+                                'name', struct('nameX', nameS1, 'nameY', nameS2),...
+                                'opVal', opVal,...
+                                'op', op,...
+                                'type', 0);
+                assignin('base', 'plotStr', plotStr);
+                app = clcPlotCstOp(plotStr, app);
+            catch Me
+                dispError(Me)
+                funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell');
+            end
         end
     catch Me
-        dispError(Me)
-        funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell')
-        
+        dispError(Me);
+        funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell');
     end
 end
 

@@ -92,7 +92,6 @@ try
     % inizializzo gli UserData
     UserData = struct();
     set(hObject, 'UserData',UserData);
-    
 %     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
             
 catch Me
@@ -1820,10 +1819,6 @@ function ckb_createPlot_CreateFcn(hObject, eventdata, handles)
     set(f, 'Visible', 'off');
     set(hObject, 'UserData', f);
     
-function pop_extData_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 function pop_file2Sel_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -1928,7 +1923,9 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
         UD = get(gcbf, 'UserData');
         [risp, handles] = clcCstOpFun(handles, UD.tTH, handles, gcbf);
         set(handles.pb_Calculate, 'UserData', risp);
-        set(handles.pb_saveOperation, 'Visible', 'on');
+        if ~isempty(risp) % se il calcolo è andato a buon fine
+            set(handles.pb_saveOperation, 'Visible', 'on');
+        end
     catch Me
         dispError(Me, handles.lbl_infoBox);
         s = sprintf('Ops! qualcosa è andato storto');
@@ -1944,7 +1941,6 @@ function pop_file1Sel_Callback(hObject, eventdata, handles)
 function pop_file2Sel_Callback(hObject, eventdata, handles)
     handles = clear_calc_data(handles); % cancella operazione precedente
     
-function pb_loadExtData_Callback(hObject, eventdata, handles)
 function pb_saveOperation_Callback(hObject, eventdata, handles)
     risp = get(handles.pb_Calculate, 'UserData');
     if ~isempty(risp)

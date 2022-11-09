@@ -29,5 +29,5 @@ function app = clcOpSelectedUpWin(app)
     set([app.clc_lblX, app.pop_file1Sel, app.lb_clcSng1, app.lb_opChan1Unit], 'Visible', viewOpt{1});
     set([app.clc_lblY, app.pop_file2Sel, app.lb_clcSng2, app.lb_opChan2Unit], 'Visible', viewOpt{2});
     set(app.lb_example, 'String', viewOpt{3});
-    set([app.pop_extData, app.pb_loadExtData],  'Visible',  viewOpt{4});
+%     set([app.pop_extData, app.pb_loadExtData],  'Visible',  viewOpt{4});
 end

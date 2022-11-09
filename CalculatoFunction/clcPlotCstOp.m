@@ -29,9 +29,18 @@ function app = clcPlotCstOp(plotStr, app)
          sp(1) = subplot(2,1,1);
          plot(sp(1), plotStr.sng.X, plotStr.sng.Z, 'LineWidth', 2);   ylabel(sp(1), plotStr.op);
          sp(2) = subplot(2,1,2);
-         plotStr.sng.Y
          plot(sp(2), plotStr.sng.X, plotStr.sng.Y, 'LineWidth', 2);   ylabel(sp(2), 'Ratio');
          xlabel(plotStr.name.nameX);
+         
+     elseif(strcmp(plotStr.opVal, '1D Interpolation'))  
+         sp(1) = subplot(2,1,1);
+         plot(sp(1), plotStr.sng(1).X', 'LineWidth', 2, 'DisplayName', plotStr.name(1).nameX); hold on;
+         plot(sp(1), plotStr.sng(1).Z', 'LineWidth', 2, 'DisplayName', 'Result');
+         ylabel(sp(1), plotStr.op);
+         a = subplot(2,1,2);
+         plot(a, plotStr.sng(1).Y, plotStr.sng(2).Y,  'LineWidth', 2, 'DisplayName', 'Data'); grid minor;
+         ylabel(a, plotStr.name(2).nameY);
+         xlabel(a, plotStr.name(1).nameY);
          
      else
         sp(1) = subplot(3,1,1);
