@@ -46,33 +46,35 @@ end
 
 % --- Executes just before RatioReqObj is made visible.
 function RatioReqObj_OpeningFcn(hObject, eventdata, handles, varargin)
-% This function has no output args, see OutputFcn.
-% hObject    handle to figure
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to RatioReqObj (see VARARGIN)
-
-% Choose default command line output for RatioReqObj
 handles.output = hObject;
-handles.hCaller = [];
-if not(isempty(varargin))
-    if any(strcmp(varargin, 'String'))
-        names = varargin{find(strcmp(varargin, 'String'))+1};
-        set(handles.vhcSignal, 'String', ['vhc speed ', names{1}]);
-        set(handles.engSpeedSignal, 'String', ['Eng speed ', names{2}]);
+
+    if not(isempty(varargin))
+        if any(strcmp(varargin, 'String'))
+            names = varargin{find(strcmp(varargin, 'String'))+1};
+            set(handles.vhcSignal, 'String', ['vhc speed ', names{1}]);
+            set(handles.engSpeedSignal, 'String', ['Eng speed ', names{2}]);
+        end
+        if any(strcmp(varargin, 'tTH'))
+            UD = varargin{find(strcmp(varargin, 'tTH'))+1};
+            set(hObject, 'UserData', UD);
+        end
     end
-    if any(strcmp(varargin, 'tTH'))
-        UD = varargin{find(strcmp(varargin, 'tTH'))+1};
-        set(hObject, 'UserData', UD);
-    end
-end
-handles.msg = {}; % salvo messaggi per InfoBox
 guidata(hObject, handles);
 
 
 % UIWAIT makes RatioReqObj wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
-
+function reactivation(ratio, handles, varargin)
+    if nargin == 2 % non sono stati passati gli handles
+        handles = struct();
+        for i=1:length(ratio.Children)
+            handles.(ratio.Children(i).Tag) = ratio.Children(i);
+        end
+        set(ratio, 'Visible', 'on'); 
+    end
+    
+    return
+    
 
 % --- Outputs from this function are returned to the command line.
 function varargout = RatioReqObj_OutputFcn(hObject, eventdata, handles, varargin) 
@@ -83,7 +85,6 @@ function varargout = RatioReqObj_OutputFcn(hObject, eventdata, handles, varargin
 
 % Get default command line output from handles structure
 varargout{1} = hObject;
-varargout{2} = handles.msg;
 
 
 % --- Executes during object creation, after setting all properties.
@@ -139,7 +140,8 @@ function Savebtt_Callback(hObject, eventdata, handles)
         
     catch Me
         dispError(Me)
-        handles.msg = errorTracking(Me);
+        hObject = gcbf;
+        errorTracking(Me);
     end
 
 

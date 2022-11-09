@@ -1,5 +1,6 @@
-function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
+function [risp, app]= clcCstOpFun(app, tTHstore)
     risp = [];
+    OpUserData = get(app.pop_selOperation, 'UserData'); % se ho richiamato la steta funzione la riapro semplicemente;
     % get operator
     lista = get(app.pop_selOperation, 'String');
     val =   get(app.pop_selOperation, 'Value');
@@ -42,28 +43,48 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
             case 'Calc Tire Radius'
                 Y = tTH2.(nameS2).v;
 %                 f = questdlg('prova')
-                
-                [ratio, msg] = RatioReqObj('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
-                                                'tTH', tTH1);
-                waitfor(ratio, 'UserData');
-                RatioData = get(ratio, 'UserData');
-                delete(ratio);
-                if ~isempty(msg)
-                     funWriteToInfobox(handles.lbl_infoBox, msg, 'cell')
+                if isempty(OpUserData.tireCalc)% creo da 0 l'obj
+                    ratio = RatioReqObj('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
+                                                    'tTH', tTH1);
+                                                set(ratio, 'Visible', 'on')
+                else
+                    ratio = OpUserData.tireCalc;
+                    assignin('base', 'ratio', ratio);
+                    handles = struct();
+                    for i=1:length(ratio.Children)
+                        handles.(ratio.Children(i).Tag) = ratio.Children(i);
+                    end
+                    set(handles.vhcSignal, 'String', ['vhc speed ', tTHname1, ':', nameS1]);
+                    set(handles.engSpeedSignal, 'String', ['Eng speed ', tTHname1, ':', nameS2]);
+                    
+                    set(ratio, 'UserData', tTH1);
+                    set(ratio, 'Visible', 'on');
                 end
+                assignin('base', 'ratio', ratio)
+                waitfor(ratio, 'Visible');
+                RatioData = get(ratio, 'UserData');
                 if isfield(RatioData, 'CalcAutogenRatios') %
+                    size(X)
+                    size(RatioData.CalcAutogenRatios.v)
                     risp = (X/3.6)./(Y*2*pi/60./RatioData.CalcAutogenRatios.v);
                     Y = RatioData.CalcAutogenRatios.v;
                     op = 'radius Tire';
                 else
                     plotFlag = false; % non creo il plot
                 end
-       
+                OpUserData.tireCalc = ratio;
+                
             case '1D Interpolation' % selezionata la somma
-                InterpData = loadInterpData_1D;
+                if isempty(OpUserData.interp1D) % lo chiamo per la prima volta
+                    InterpData = loadInterpData_1D;
+                else
+                    InterpData = OpUserData.interp1D; % esistente lo riapro
+                    set(InterpData, 'Visible', 'on');
+                end
                 waitfor(InterpData, 'Visible');
                 UD = get(InterpData, 'UserData'); out = UD.out;
-                delete(InterpData);
+                OpUserData.interp1D = InterpData;
+%                 delete(InterpData);
                 if ~isempty(out)
                     nameS2 = cell(2,1);  Y = cell(2,1);
                     risp = interp1(out.x, out.y, X);
@@ -106,12 +127,13 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
                 app = clcPlotCstOp(plotStr, app);
             catch Me
                 dispError(Me)
-                funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell');
+                funWriteToInfobox(app.lbl_infoBox, errorTracking(Me), 'cell');
             end
         end
+        set(app.pop_selOperation, 'UserData', OpUserData);
     catch Me
         dispError(Me);
-        funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell');
+        funWriteToInfobox(app.lbl_infoBox, errorTracking(Me), 'cell');
     end
 end
 

@@ -1,5 +1,6 @@
-function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
+function [risp, app]= clcCstOpFun(app, tTHstore)
     risp = [];
+    OpUserData = get(app.pop_selOperation, 'UserData'); % se ho richiamato la steta funzione la riapro semplicemente;
     % get operator
     lista = get(app.pop_selOperation, 'String');
     val =   get(app.pop_selOperation, 'Value');
@@ -42,14 +43,22 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
             case 'Calc Tire Radius'
                 Y = tTH2.(nameS2).v;
 %                 f = questdlg('prova')
-                
-                [ratio, msg] = RatioReqObj('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
-                                                'tTH', tTH1);
-                waitfor(ratio, 'UserData');
+                if isempty(OpUserData.tireCalc)% creo da 0 l'obj
+                    [ratio, msg] = RatioReqObj('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
+                                                    'tTH', tTH1);
+                else
+                    ratio = OpUserData.tireCalc;
+                    set(ratio, 'Visible', 'on');
+                    set(handles.vhcSignal, 'String', ['vhc speed ', names{1}]);
+                    set(handles.engSpeedSignal, 'String', ['Eng speed ', names{2}]);
+    if any(strcmp(varargin, 'tTH'))
+        UD = varargin{find(strcmp(varargin, 'tTH'))+1};
+                end
+                waitfor(ratio, 'Visible');
                 RatioData = get(ratio, 'UserData');
                 delete(ratio);
                 if ~isempty(msg)
-                     funWriteToInfobox(handles.lbl_infoBox, msg, 'cell')
+                     funWriteToInfobox(app.lbl_infoBox, msg, 'cell')
                 end
                 if isfield(RatioData, 'CalcAutogenRatios') %
                     risp = (X/3.6)./(Y*2*pi/60./RatioData.CalcAutogenRatios.v);
@@ -60,24 +69,25 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
                 end
        
             case '1D Interpolation' % selezionata la somma
-                InterpData = loadInterpData('String', {[tTHname1, ':', nameS1], [tTHname1, ':', nameS2]},...
-                                                'tTH', tTH1);
+                if isempty(OpUserData.interp1D) % lo chiamo per la prima volta
+                    InterpData = loadInterpData_1D;
+                else
+                    InterpData = OpUserData.interp1D; % esistente lo riapro
+                    set(InterpData, 'Visible', 'on');
+                end
                 waitfor(InterpData, 'Visible');
-                out = get(InterpData, 'out');
-                risp = interp1(out.x, out.y, X);
-                Y = RatioData.CalcAutogenRatios.v;
-%                 
-%             case '2D Interpolation'
-%                 mapName = app.extData.Value;
-%                 tab = app.UD.extData.tab.(mapName);
-%                 X = tab.X; 
-%                 Y = tab.Y;
-%                 V = tab.V;
-%                 Xq = tTH.(nameS1).v;  xrpl = nameS1;
-%                 Yq = tTH.(nameS2).v;  xrp2 = nameS2;
-%                 op = 'interp1(X,Y,V,Xq,Yq)';
-%                 risp = eval(op);
-%                 op = strrep(op,'Xq',xrpl); op = strrep(op,'Yq',xrp2);
+                UD = get(InterpData, 'UserData'); out = UD.out;
+                OpUserData.interp1D = InterpData;
+%                 delete(InterpData);
+                if ~isempty(out)
+                    nameS2 = cell(2,1);  Y = cell(2,1);
+                    risp = interp1(out.x, out.y, X);
+                    Y{1} = out.x; Y{2}=out.y;
+                    op = 'Interpolation';
+                    nameS2{1} = out.x_name; nameS2{2} = out.y_name;
+                else
+                    plotFlag = false;
+                end
 
             otherwise
                 if any(strcmp(opVal, {'abs', 'sin', 'cos', 'asin', 'acos', 'tan', 'atan'}))
@@ -101,18 +111,23 @@ function [risp, app]= clcCstOpFun(app, tTHstore, handles, hCaller)
         end
         
         if plotFlag
-           plotStr = struct('sng',  struct('X', X, 'Y', Y, 'Z', risp),...
-                            'name', struct('nameX', nameS1, 'nameY', nameS2),...
-                            'opVal', opVal,...
-                            'op', op,...
-                            'type', 0);
-
-            app = clcPlotCstOp(plotStr, app);
+            try
+               plotStr = struct('sng',  struct('X', X, 'Y', Y, 'Z', risp),...
+                                'name', struct('nameX', nameS1, 'nameY', nameS2),...
+                                'opVal', opVal,...
+                                'op', op,...
+                                'type', 0);
+                assignin('base', 'plotStr', plotStr);
+                app = clcPlotCstOp(plotStr, app);
+            catch Me
+                dispError(Me)
+                funWriteToInfobox(app.lbl_infoBox, errorTracking(Me), 'cell');
+            end
         end
+        set(app.pop_selOperation, 'UserData', OpUserData);
     catch Me
-        dispError(Me)
-        funWriteToInfobox(handles.lbl_infoBox, errorTracking(Me), 'cell')
-        
+        dispError(Me);
+        funWriteToInfobox(app.lbl_infoBox, errorTracking(Me), 'cell');
     end
 end
 

@@ -56,7 +56,6 @@ UserData = struct('file', '',...% Percorso completo del file
                   'Xsel', [],... % x selezionata
                   'Ysel', [],... % y selezionata
                   'out', []); % struttura di output semplificata
-                 
 set(hObject, 'UserData', UserData);
 guidata(hObject, handles);
 

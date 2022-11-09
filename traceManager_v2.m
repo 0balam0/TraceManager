@@ -92,10 +92,9 @@ try
     % inizializzo gli UserData
     UserData = struct();
     set(hObject, 'UserData',UserData);
-%     handles.xSignalTab.Data = {'time', 'time', 'time', 'time', 'time', 'time', 'time', 'time'}'; 
             
 catch Me
-    dispError(Me, handles.lbl_infoBox)
+    dispError(Me, handles.lbl_infoBox);
 end
 
 return
@@ -105,7 +104,6 @@ function varargout = traceManager_v2_OutputFcn(hObject, eventdata, handles)
 return
 
 %%%%%%%%% pannello di selezione grandezze %%%%%%%%%%
-
 function lb_avail_Callback(hObject, eventdata, handles)
 
 try
@@ -1810,7 +1808,11 @@ end
               '1D Interpolation', '2D Interpolation', 'Calc Tire Radius'};
     set(hObject, 'String', opList);
     set(hObject, 'Value', 1);
-
+    % dopo la prima esecuzione dei diversi ogetti li memonizzo in UserData 
+    OpUserData = struct('interp1D', [],... 
+                        'tireCalc', []);
+    set(hObject, 'UserData', OpUserData);
+    
 function pb_Calculate_CreateFcn(hObject, eventdata, handles)
     set(hObject, 'UserData', []);
     
@@ -1921,10 +1923,12 @@ function pb_Calculate_Callback(hObject, eventdata, handles)
     set(handles.pb_Calculate, 'UserData', []);
     try
         UD = get(gcbf, 'UserData');
-        [risp, handles] = clcCstOpFun(handles, UD.tTH, handles, gcbf);
+        [risp, handles] = clcCstOpFun(handles, UD.tTH);
         set(handles.pb_Calculate, 'UserData', risp);
         if ~isempty(risp) % se il calcolo è andato a buon fine
             set(handles.pb_saveOperation, 'Visible', 'on');
+        else
+            set(handles.pb_saveOperation, 'Visible', 'off'); 
         end
     catch Me
         dispError(Me, handles.lbl_infoBox);
