@@ -1,35 +1,35 @@
-function varargout = loadInterpData_1D(varargin)
-% LOADINTERPDATA_1D MATLAB code for loadInterpData_1D.fig
-%      LOADINTERPDATA_1D, by itself, creates a new LOADINTERPDATA_1D or raises the existing
+function varargout = loadInterpData_2D(varargin)
+% LOADINTERPDATA_2D MATLAB code for loadInterpData_2D.fig
+%      LOADINTERPDATA_2D, by itself, creates a new LOADINTERPDATA_2D or raises the existing
 %      singleton*.
 %
-%      H = LOADINTERPDATA_1D returns the handle to a new LOADINTERPDATA_1D or the handle to
+%      H = LOADINTERPDATA_2D returns the handle to a new LOADINTERPDATA_2D or the handle to
 %      the existing singleton*.
 %
-%      LOADINTERPDATA_1D('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in LOADINTERPDATA_1D.M with the given input arguments.
+%      LOADINTERPDATA_2D('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in LOADINTERPDATA_2D.M with the given input arguments.
 %
-%      LOADINTERPDATA_1D('Property','Value',...) creates a new LOADINTERPDATA_1D or raises the
+%      LOADINTERPDATA_2D('Property','Value',...) creates a new LOADINTERPDATA_2D or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before loadInterpData_1D_OpeningFcn gets called.  An
+%      applied to the GUI before loadInterpData_2D_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to loadInterpData_1D_OpeningFcn via varargin.
+%      stop.  All inputs are passed to loadInterpData_2D_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help loadInterpData_1D
+% Edit the above text to modify the response to help loadInterpData_2D
 
-% Last Modified by GUIDE v2.5 10-Nov-2022 16:47:01
+% Last Modified by GUIDE v2.5 10-Nov-2022 16:57:06
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @loadInterpData_1D_OpeningFcn, ...
-                   'gui_OutputFcn',  @loadInterpData_1D_OutputFcn, ...
+                   'gui_OpeningFcn', @loadInterpData_2D_OpeningFcn, ...
+                   'gui_OutputFcn',  @loadInterpData_2D_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,17 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before loadInterpData_1D is made visible.
-function loadInterpData_1D_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before loadInterpData_2D is made visible.
+function loadInterpData_2D_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 UserData = struct('file', '',...% Percorso completo del file
                   'sName', '',...% nome del foglio selezionato
                   'num', [],... % matrice dei valori all'interno del foglio
-                  'txt', [],... % celle dell'intestazione
                   'X', [],... % valori della X Da elaborare
                   'Y', [],... % valori della Y da elaborare
-                  'Xsel', [],... % x selezionata
-                  'Ysel', [],... % y selezionata
+                  'V', [],... % valori matrice
                   'Extrp', '',... % extrapolation method linear default
                   'out', []); % struttura di output semplificata
 set(hObject, 'UserData', UserData);
@@ -63,10 +61,10 @@ set(hObject, 'UserData', UserData);
 guidata(hObject, handles);
 pop_plotType_Callback(handles.pop_plotType, [], handles);
 
-% UIWAIT makes loadInterpData_1D wait for user response (see UIRESUME)
+% UIWAIT makes loadInterpData_2D wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
 
-function varargout = loadInterpData_1D_OutputFcn(hObject, eventdata, handles) 
+function varargout = loadInterpData_2D_OutputFcn(hObject, eventdata, handles) 
 varargout{1} = hObject;
 
 function edit1_CreateFcn(hObject, eventdata, handles)
@@ -74,15 +72,6 @@ if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgr
     set(hObject,'BackgroundColor','white');
 end
 
-function selectX_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
-
-function selectY_CreateFcn(hObject, eventdata, handles)
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
 function sheetNames_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
@@ -90,20 +79,20 @@ end
 
 % --- Executes on button press in saveBtt.
 function showData(handles)
-%     assignin('base', ' hl', handles);
-
     UserData = get(handles.figure1,'UserData');
 	if ~isempty(UserData) % prima esecuzione
-        X = UserData.X; Y = UserData.Y; txt = UserData.txt; Xsel = UserData.Xsel; Ysel = UserData.Ysel;
+        X = UserData.X; Y = UserData.Y; V = UserData.V; 
         [~, fileName,~] = fileparts(UserData.file);
-        if (~isempty(X) && ~isempty(Y)) && (length(X) == length(Y)) %% posso fare la rappresentazione
+        if (~isempty(X) && ~isempty(Y) && ~isempty(V)) %% posso fare la rappresentazione
             switch get(handles.pop_plotType, 'UserData')
                 case 'Plot'
                     plotData(UserData, handles)
                 case 'Table'
                     compileTable(UserData, handles);
+                case 'Contour'
+                    contourPlot(UserData, handles);
             end
-            s = sprintf('%s\\%s\\(x: %s, y:%s)', fileName, UserData.sName, txt{1, Xsel}, txt{1, Ysel});
+            s = sprintf('%s\\%s', fileName, UserData.sName);
             set(handles.data_lbl, 'String', s);
         else
             cla(handles.axes2);
@@ -113,50 +102,28 @@ function showData(handles)
     return
 
 function plotData(UserData, handles)
-    X = UserData.X; Y = UserData.Y;
-    Xsel = UserData.Xsel; Ysel = UserData.Ysel;
-    txt = UserData.txt;
+    X = UserData.X; Y = UserData.Y; V = UserData.V;
     cla(handles.axes2);
-    plot(handles.axes2, X,Y);
+    for i=1:length(X)
+        plot(handles.axes2, Y, V(:,i), 'DisplayName', sprintf('Col: %.2f', X)); hold on;
+    end
     set(handles.axes2,'XMinorGrid','on');
     set(handles.axes2,'YMinorGrid','on');
-    xlabel(handles.axes2,sprintf('%s [%s]', txt{1, Xsel}, txt{2, Xsel}));
-    ylabel(handles.axes2,sprintf('%s [%s]', txt{1, Ysel}, txt{2, Ysel})); 
+
 return
 
 function compileTable(UserData, handles)
-    set(handles.DataTable,'data', UserData.num);
-    set(handles.DataTable,'ColumnName', UserData.txt(1,:))
+    set(handles.DataTable,'data', UserData.V);
+    set(handles.DataTable,'ColumnName', UserData.X);
+    set(handles.DataTable,'RowName', UserData.Y);
 return
+ 
+function contourPlot(UserData, handles)
+    cla(handles.axes2);
+    contour(UserData.X, UserData.Y, UserData.V);
+    
 
 
-function selectY_Callback(hObject, eventdata, handles)
-%     assignin('base', 'hl', handles);
-    val = get(hObject, 'Value');
-    UserData = get(handles.figure1,'UserData');
-    num = UserData.num;
-    txt = UserData.txt;
-    UserData.Y = num(:,val);
-    UserData.Ysel = val;
-    u = txt{2, val};
-    set(handles.unitY, 'String', u);
-    set(handles.figure1,'UserData', UserData);
-    showData(handles)
-    
-function selectX_Callback(hObject, eventdata, handles)
-    val = get(hObject, 'Value');
-    UserData = get(handles.figure1,'UserData');
-    num = UserData.num;
-    txt = UserData.txt;
-    UserData.X = num(:,val);
-    UserData.Xsel = val;
-    u = txt{2, val};
-    set(handles.unitX, 'String', u);
-    set(handles.figure1,'UserData', UserData);
-    showData(handles)
-    
-    
-function edit1_Callback(hObject, eventdata, handles)
 function sheetNames_Callback(hObject, eventdata, handles)
     UserData = get(handles.figure1,'UserData');
     file = UserData.file;
@@ -166,49 +133,21 @@ function sheetNames_Callback(hObject, eventdata, handles)
     lista = get(hObject, 'String');
     name = lista{val};
     UserData.sName = name;
-    hideSelection(handles, 'xy', 'off');
     try
-        [num, txt, ~] = xlsread(file, name);
-        if ~isempty(num)
-            stxt = size(txt);
-            s = size(num);
-            if stxt(1) == 0 % non ci sono nomi nelle colonne
-                txt = cell(2,s(2));
-                for i=1:s(2)
-                    txt{1, i} = sprintf('column %d',i);
-                end               
-            end
-            stxt = size(txt);
-            if stxt(1) == 1
-                for i=1:s(2)
-                    txt{2, i} = sprintf('?');
-                end 
-            end
-            set(handles.selectX, 'String', txt(1,:));
-            set(handles.selectY, 'String', txt(1,:));
-            set(handles.selectX, 'Visible', 'on');
-            set(handles.selectY, 'Visible', 'on');
+        [num, ~, ~] = xlsread(file, name);
+        if ~isempty(num) 
             UserData.num = num;
-            UserData.txt = txt;
+            UserData.X = num(1,2:end); UserData.Y = num(2:end, 1); UserData.V = num(2:end, 2:end);
             set(handles.figure1,'UserData', UserData);
-            selectY_Callback(handles.selectY, [], handles);
-            selectX_Callback(handles.selectX, [], handles);
             set(handles.data_lbl, 'String', [fileName,'\', name]);
-            hideSelection(handles, 'xy', 'on');
+            showData(handles);
         else
-            UserData.num = [];
-            UserData.txt = [];
-            UserData.X = [];
-            UserData.Y = [];
-            set(handles.selectX, 'Visible', 'off');
-            set(handles.selectY, 'Visible', 'off');
+            UserData.num = []; UserData.X = []; UserData.Y = []; 
             set(handles.figure1,'UserData', UserData);
             set(handles.data_lbl, 'String', [fileName,'\', name, '-> the sheet appears empty']);
-            hideSelection(handles, 'xy', 'off');
         end
     catch Me
         dispError(Me);
-        hideSelection(handles, 'xy', 'off');
         set(handles.data_lbl, 'String', [fileName,'\', name, '-> Something gone wrong! Please choose an file!']);
     end
     return
@@ -217,11 +156,6 @@ function hideSelection(handles, type, flag)
 switch type
     case 'all'
         set(handles.sheetNames, 'Visible', flag);
-        set(handles.selectX, 'Visible', flag);
-        set(handles.selectY, 'Visible', flag);
-    case 'xy'
-        set(handles.selectX, 'Visible', flag);
-        set(handles.selectY, 'Visible', flag);
     case 'sheet'
         set(handles.sheetNames, 'Visible', flag);
 end
@@ -274,9 +208,7 @@ function figure1_CloseRequestFcn(hObject, eventdata, handles, varargin)
         if ~isempty(varargin)
             lista = get(handles.pop_mth, 'String');
             val   = get(handles.pop_mth, 'Value');
-            out = struct('x', UD.X, 'y', UD.Y,...
-                 'x_name', UD.txt{1, UD.Xsel},...
-                 'y_name', UD.txt{1, UD.Ysel},...
+            out = struct('x', UD.X, 'y', UD.Y, 'v', UD.V,...
                  'extrap', get(handles.extrapolation, 'Value'),...
                  'method', lista{val});
         else
@@ -308,14 +240,16 @@ function pop_plotType_Callback(hObject, eventdata, handles)
     lista = get(hObject, 'String');
     val   = get(hObject, 'Value');
     set(hObject, 'UserData', lista{val});
-    if strcmp(lista{val}, 'Plot')
-        set(handles.DataTable, 'Visible', 'off');
-        set(handles.axes2, 'Visible', 'on');
-        showData(handles);
-    elseif strcmp(lista{val}, 'Table')
-        set(handles.DataTable, 'Visible', 'on');
-        set(handles.axes2, 'Visible', 'off');
-        showData(handles);
+    switch lista{val}
+        case 'Table'
+            set(handles.DataTable, 'Visible', 'on');
+            set(handles.axes2, 'Visible', 'off');
+            showData(handles);
+        otherwise
+            set(handles.DataTable, 'Visible', 'off');
+            set(handles.axes2, 'Visible', 'on');
+            showData(handles);
+            
     end
 
 

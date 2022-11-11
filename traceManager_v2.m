@@ -1791,7 +1791,6 @@ function handles = clear_calc_data(handles) %handles = clear_calc_data;
     % cancella operazione precendete e disabilita il pulsante salva;
     set(handles.pb_Calculate, 'UserData', []); % cancello i dati del calcolo;
     set(handles.pb_saveOperation, 'Visible', 'off');
-%     set(handles.lbl_outInfo, 'String', 'No calculation performed!')
 return
 
 function pop_file1Sel_CreateFcn(hObject, eventdata, handles)
@@ -1810,6 +1809,7 @@ end
     set(hObject, 'Value', 1);
     % dopo la prima esecuzione dei diversi ogetti li memonizzo in UserData 
     OpUserData = struct('interp1D', [],... 
+                        'interp2D', [],... 
                         'tireCalc', []);
     set(hObject, 'UserData', OpUserData);
     

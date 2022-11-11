@@ -34,9 +34,14 @@ if ~isempty(x)
         Y = ((Cursor.TextInfo{i}.UserData(1).Parent.YLim(2)-...
             Cursor.TextInfo{i}.UserData(1).Parent.YLim(1))/2)+... 
             Cursor.TextInfo{i}.UserData(1).Parent.YLim(1); % al centro del grafico
+        Cursor.TextInfo{i}.UserData(1).Parent.XLim(2)
+        XposTxt = X + (Cursor.TextInfo{i}.UserData(1).Parent.XLim(2)-...
+                 Cursor.TextInfo{i}.UserData(1).Parent.XLim(1))*0.01;
+%              XposTxt
         if ~isempty(Cursor.TextInfo{i}.UserData)
             set(Cursor.TextInfo{i}, 'String', strCum,'interpreter', 'tex');
-            set(Cursor.TextInfo{i}, 'Position', [X+0.01*X, Y, 0]);
+            set(Cursor.TextInfo{i}, 'Position', [XposTxt, Y, 0]);
+            assignin('base', 'c', Cursor.TextInfo{i});
         end
     end
     LabelHandle=findobj(Cursor.Handles, 'Type', 'text');

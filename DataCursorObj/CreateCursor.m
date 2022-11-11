@@ -126,7 +126,7 @@ for i=1:length(AxesList)
 end
 axs = findobj(fhandle, 'type', 'axes'); %trovo tutti gli obj assi
 for i=1:length(axs)
-    t = text(axs(i), 0, 0, '', 'interpreter', 'tex', 'Tag', strcat('CursorInfo_',num2str(NumberOfCursor)));
+    t = text(axs(i), 0, 0, '', 'interpreter', 'tex', 'Tag', strcat('CursorInfo_',num2str(NumberOfCursor)),'Interruptible','off');
     parents = findobj(axs(i), '-regexp','Tag', 'line_[^]');
     set(t, 'UserData', parents);
     Cursors{NumberOfCursor}.TextInfo{i} = t;
@@ -165,6 +165,7 @@ m = uimenu(cmenu, 'Label', 'Delete', 'Callback', @Delete,...
     'UserData', NumberOfCursor);
 m2 = uimenu(cmenu,'Label', 'Get Data', 'Callback', @GetData, 'UserData', NumberOfCursor);
 m2 = uimenu(cmenu,'Label', 'Go to', 'Callback', @GoTo, 'UserData', NumberOfCursor);
+m2 = uimenu(cmenu,'Label', 'Change background', 'Callback', @changeBackground, 'UserData', NumberOfCursor);
 set(Cursors{NumberOfCursor}.Handles, 'UIContextMenu', cmenu);
 setappdata(fhandle, 'VerticalCursors', Cursors);
 set(gcf, 'WindowButtonMotionFcn',{@CursorWindowButtonMotionFcn});
@@ -403,4 +404,19 @@ function GoTo(hObject, EventData)
             dispDataCursor(Cursors{n}, xPos);
         end
     end  
+end
+
+function changeBackground(hObject, EventData)
+    fhandle=ancestor(hObject, 'figure');
+    n=get(hObject, 'UserData');
+    Cursors=getappdata(fhandle, 'VerticalCursors');
+    Cursor = Cursors{n};
+    assignin('base', 'C', Cursor);
+    BGc = [1 1 1];
+    if any(isnumeric(get(Cursor.TextInfo{1}, 'BackgroundColor')))
+        BGc = 'none';
+    end
+    for i=1:length(Cursor.TextInfo)
+        set(Cursor.TextInfo{i}, 'BackgroundColor', BGc);
+    end
 end
