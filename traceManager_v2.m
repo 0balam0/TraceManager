@@ -69,7 +69,7 @@ try
     guidata(hObject, handles);
     
     % version string
-    set(handles.figSalvaTH,'name','Trace Manager v2.02');
+    set(handles.figSalvaTH,'name','Trace Manager v2.03');
     
     % setto la grafica dell'interfaccia
     inizializzaInterfaccia(handles)
